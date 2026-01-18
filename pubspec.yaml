@@ -1,0 +1,42 @@
+# pubspec.yaml
+name: paket_3_training
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+environment:
+  sdk: ^3.10.0
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  cupertino_icons: ^1.0.2
+  http: ^1.6.0
+  dio: ^5.9.0
+  riverpod: ^3.1.0
+  shared_preferences: ^2.5.4
+  flutter_secure_storage: ^10.0.0
+  flutter_dotenv: ^6.0.0
+  supabase_flutter: ^2.12.0
+  intl: ^0.20.2
+  image_picker: ^1.2.1
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  fl_chart: ^1.1.1
+  path: ^1.9.1
+  url_launcher: ^6.3.2
+  go_router: ^17.0.1
+  permission_handler: ^12.0.1
+  file_picker: ^10.3.8
+  flutter_riverpod: ^3.1.0
+  hooks_riverpod: ^3.1.0
+  flutter_hooks: ^0.21.3+1
+  flutter_animate: ^4.5.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - .env

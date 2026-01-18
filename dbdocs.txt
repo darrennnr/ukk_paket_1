@@ -1,0 +1,98 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.alat (
+  alat_id integer NOT NULL DEFAULT nextval('alat_alat_id_seq'::regclass),
+  kategori_id integer,
+  kode_alat character varying NOT NULL UNIQUE,
+  nama_alat character varying NOT NULL,
+  kondisi character varying DEFAULT 'baik'::character varying,
+  jumlah_total integer NOT NULL DEFAULT 0,
+  jumlah_tersedia integer NOT NULL DEFAULT 0,
+  harga_perhari numeric,
+  foto_alat character varying,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT alat_pkey PRIMARY KEY (alat_id),
+  CONSTRAINT alat_kategori_id_fkey FOREIGN KEY (kategori_id) REFERENCES public.kategori(kategori_id)
+);
+CREATE TABLE public.kategori (
+  kategori_id integer NOT NULL DEFAULT nextval('kategori_kategori_id_seq'::regclass),
+  nama_kategori character varying NOT NULL,
+  deskripsi text,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT kategori_pkey PRIMARY KEY (kategori_id)
+);
+CREATE TABLE public.log_aktivitas (
+  log_id integer NOT NULL DEFAULT nextval('log_aktivitas_log_id_seq'::regclass),
+  user_id integer NOT NULL,
+  aktivitas character varying NOT NULL,
+  tabel_terkait character varying,
+  id_terkait integer,
+  deskripsi text,
+  user_agent text,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT log_aktivitas_pkey PRIMARY KEY (log_id),
+  CONSTRAINT log_aktivitas_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id)
+);
+CREATE TABLE public.peminjaman (
+  peminjaman_id integer NOT NULL DEFAULT nextval('peminjaman_peminjaman_id_seq'::regclass),
+  peminjam_id integer,
+  alat_id integer,
+  petugas_id integer,
+  kode_peminjaman character varying NOT NULL UNIQUE,
+  jumlah_pinjam integer NOT NULL DEFAULT 1,
+  tanggal_pengajuan timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  tanggal_pinjam date,
+  tanggal_berakhir date NOT NULL,
+  keperluan text,
+  status_peminjaman_id integer,
+  catatan_petugas text,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT peminjaman_pkey PRIMARY KEY (peminjaman_id),
+  CONSTRAINT peminjaman_peminjam_id_fkey FOREIGN KEY (peminjam_id) REFERENCES public.users(user_id),
+  CONSTRAINT peminjaman_alat_id_fkey FOREIGN KEY (alat_id) REFERENCES public.alat(alat_id),
+  CONSTRAINT peminjaman_petugas_id_fkey FOREIGN KEY (petugas_id) REFERENCES public.users(user_id),
+  CONSTRAINT peminjaman_status_peminjaman_id_fkey FOREIGN KEY (status_peminjaman_id) REFERENCES public.status_peminjaman(id)
+);
+CREATE TABLE public.pengembalian (
+  pengembalian_id integer NOT NULL DEFAULT nextval('pengembalian_pengembalian_id_seq'::regclass),
+  peminjaman_id integer,
+  petugas_id integer,
+  tanggal_kembali timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  kondisi_alat character varying DEFAULT 'baik'::character varying,
+  jumlah_kembali integer NOT NULL,
+  keterlambatan_hari integer DEFAULT 0,
+  catatan text,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  total_pembayaran bigint,
+  status_pembayaran text,
+  CONSTRAINT pengembalian_pkey PRIMARY KEY (pengembalian_id),
+  CONSTRAINT pengembalian_peminjaman_id_fkey FOREIGN KEY (peminjaman_id) REFERENCES public.peminjaman(peminjaman_id),
+  CONSTRAINT pengembalian_petugas_id_fkey FOREIGN KEY (petugas_id) REFERENCES public.users(user_id)
+);
+CREATE TABLE public.role (
+  id integer NOT NULL DEFAULT nextval('role_id_seq'::regclass),
+  role character varying,
+  CONSTRAINT role_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.status_peminjaman (
+  id integer NOT NULL DEFAULT nextval('status_peminjaman_id_seq'::regclass),
+  status_peminjaman character varying,
+  CONSTRAINT status_peminjaman_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.users (
+  user_id integer NOT NULL DEFAULT nextval('users_user_id_seq'::regclass),
+  username character varying NOT NULL UNIQUE,
+  password character varying NOT NULL,
+  nama_lengkap character varying NOT NULL,
+  email character varying NOT NULL UNIQUE,
+  no_telepon character varying,
+  role_id integer,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT users_pkey PRIMARY KEY (user_id),
+  CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES public.role(id)
+);

@@ -23,6 +23,7 @@ class _HistoryPeminjamanScreenState
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _searchQuery = '';
   int? _selectedStatusFilter; // null = semua
+  bool _hasInitializedProviders = false;
 
   bool get _isDesktop => MediaQuery.of(context).size.width >= 900;
   bool get _isTablet =>
@@ -32,15 +33,28 @@ class _HistoryPeminjamanScreenState
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    // Provider initialization is now done in build method when auth is ready
+  }
+
+  void _initializeProviders() {
+    if (!_hasInitializedProviders) {
+      _hasInitializedProviders = true;
       ref.read(myPeminjamanProvider.notifier).refresh();
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
     final peminjamanState = ref.watch(myPeminjamanProvider);
-    final user = ref.watch(authProvider).user;
+    final user = authState.user;
+
+    // Wait for auth to complete before initializing providers
+    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeProviders();
+      });
+    }
 
     // Filter peminjaman berdasarkan search dan status
     final filteredPeminjaman = peminjamanState.peminjamans.where((p) {

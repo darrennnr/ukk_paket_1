@@ -35,10 +35,10 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    Future.microtask(() {
-      ref.read(peminjamanProvider.notifier).refresh();
-      ref.read(peminjamanMenungguProvider.notifier).refresh();
-      ref.read(peminjamanAktifProvider.notifier).refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(peminjamanProvider.notifier).ensureInitialized();
+      ref.read(peminjamanMenungguProvider.notifier).ensureInitialized();
+      ref.read(peminjamanAktifProvider.notifier).ensureInitialized();
     });
   }
 

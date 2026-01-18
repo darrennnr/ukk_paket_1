@@ -27,9 +27,9 @@ class _KategoriManagementState extends ConsumerState<KategoriManagement> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(kategoriProvider.notifier).refresh();
-      ref.read(alatProvider.notifier).refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(kategoriProvider.notifier).ensureInitialized();
+      ref.read(alatProvider.notifier).ensureInitialized();
     });
   }
 

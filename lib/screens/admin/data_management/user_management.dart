@@ -28,7 +28,9 @@ class _UserManagementState extends ConsumerState<UserManagement> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(userProvider.notifier).refresh());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(userProvider.notifier).ensureInitialized();
+    });
   }
 
   @override

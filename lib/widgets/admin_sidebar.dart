@@ -12,8 +12,11 @@ class AdminSidebar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authProvider).user;
-    final roleName = user?.role?.role?.toLowerCase() ?? '';
+    final authState = ref.watch(authProvider);
+    final user = authState.user;
+    final isAuthLoading = authState.isLoading;
+    // During loading, show all menus (optimistic rendering) to prevent disappearing menus
+    final roleName = isAuthLoading ? 'admin' : (user?.role?.role?.toLowerCase() ?? '');
     final isDrawerMode = Scaffold.maybeOf(context) != null;
 
     return LayoutBuilder(
@@ -190,10 +193,15 @@ class AdminSidebar extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: () {
-            // Only navigate if not already on this route to prevent unnecessary rebuilds
-            if (currentRoute != route) {
-              context.go(route);
+            // If already on this route, just close drawer if open and return
+            if (currentRoute == route) {
+              if (isDrawerMode) {
+                Navigator.pop(context);
+              }
+              return;
             }
+            // Navigate to new route
+            context.go(route);
             if (isDrawerMode) {
               Navigator.pop(context);
             }

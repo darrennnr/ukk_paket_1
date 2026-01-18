@@ -24,6 +24,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
   bool get _isDesktop => MediaQuery.of(context).size.width >= 900;
+  bool _hasInitializedProviders = false;
 
   // Form state
   final _formKey = GlobalKey<FormState>();
@@ -36,10 +37,15 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    Future.microtask(() {
-      ref.read(myPeminjamanProvider.notifier).refresh();
-      ref.read(alatTersediaProvider.notifier).refresh();
-    });
+    // Provider initialization is now done in build method when auth is ready
+  }
+
+  void _initializeProviders() {
+    if (!_hasInitializedProviders) {
+      _hasInitializedProviders = true;
+      ref.read(myPeminjamanProvider.notifier).ensureInitialized();
+      ref.read(alatTersediaProvider.notifier).ensureInitialized();
+    }
   }
 
   @override
@@ -50,9 +56,29 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
     final myPeminjamanState = ref.watch(myPeminjamanProvider);
     final alatTersediaState = ref.watch(alatTersediaProvider);
-    final user = ref.watch(authProvider).user;
+    final user = authState.user;
+
+    // Wait for auth to complete before initializing providers
+    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeProviders();
+      });
+    }
+
+    // Show loading state while auth is loading
+    if (authState.isLoading) {
+      return Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: const Color(0xFFF8F9FA),
+        appBar: _buildAppBar(context, 'Loading...'),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     // Filter peminjaman aktif dan pending
     final activePeminjamans = myPeminjamanState.peminjamans

@@ -39,9 +39,9 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
     _tabController = TabController(length: 2, vsync: this);
 
     // Initial Data Fetch
-    Future.microtask(() {
-      ref.read(pengembalianProvider.notifier).refresh();
-      ref.read(pengembalianBelumLunasProvider.notifier).refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(pengembalianProvider.notifier).ensureInitialized();
+      ref.read(pengembalianBelumLunasProvider.notifier).ensureInitialized();
     });
   }
 

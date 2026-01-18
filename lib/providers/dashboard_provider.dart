@@ -57,12 +57,20 @@ class DashboardState {
 // ============================================================================
 class DashboardNotifier extends Notifier<DashboardState> {
   late final DashboardService _dashboardService;
+  bool _hasInitialized = false;
 
   @override
   DashboardState build() {
     _dashboardService = DashboardService();
-    loadStatistics();
+    // DO NOT auto-load here - let screens call ensureInitialized()
     return const DashboardState();
+  }
+
+  // Call this from screens to ensure data is loaded
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadStatistics();
+    }
   }
 
   Future<void> loadStatistics() async {
@@ -93,6 +101,7 @@ class DashboardNotifier extends Notifier<DashboardState> {
         recentActivities: activities,
         isLoading: false,
       );
+      _hasInitialized = true;
     } catch (e) {
       state = DashboardState(
         statistics: state.statistics,

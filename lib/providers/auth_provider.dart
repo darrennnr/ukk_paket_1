@@ -53,7 +53,7 @@ class AuthNotifier extends Notifier<AuthState> with ChangeNotifier {
     _authService = AuthService();
     // Check session saat app start
     _checkSession();
-    return const AuthState();
+    return const AuthState(isLoading: true);
   }
   
   // Override state setter to notify listeners for GoRouter

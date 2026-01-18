@@ -31,9 +31,9 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(alatProvider.notifier).refresh();
-      ref.read(kategoriProvider.notifier).refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(alatProvider.notifier).ensureInitialized();
+      ref.read(kategoriProvider.notifier).ensureInitialized();
     });
   }
 

@@ -20,17 +20,37 @@ class DashboardAdmin extends ConsumerStatefulWidget {
 class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool get _isDesktop => MediaQuery.of(context).size.width >= 900;
+  bool _hasInitializedProviders = false;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(dashboardProvider.notifier).refresh());
+    // Provider initialization is now done in build method when auth is ready
+  }
+
+  void _initializeProviders() {
+    if (!_hasInitializedProviders) {
+      _hasInitializedProviders = true;
+      ref.read(dashboardProvider.notifier).ensureInitialized();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
     final dashboardState = ref.watch(dashboardProvider);
-    final user = ref.watch(authProvider).user;
+    final user = authState.user;
+
+    // Wait for auth to complete before initializing providers
+    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeProviders();
+      });
+    }
+
+    // Show loading skeleton while auth is loading
+    final showLoading = authState.isLoading || 
+        (dashboardState.isLoading && dashboardState.statistics.isEmpty);
 
     return Scaffold(
       key: _scaffoldKey,
@@ -56,8 +76,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
             child: RefreshIndicator(
               onRefresh: () => ref.read(dashboardProvider.notifier).refresh(),
               color: AppTheme.primaryColor,
-              child:
-                  dashboardState.isLoading && dashboardState.statistics.isEmpty
+              child: showLoading
                   ? _buildLoadingSkeleton()
                   : SingleChildScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),

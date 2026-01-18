@@ -57,13 +57,19 @@ class UserState {
 // ============================================================================
 class UserNotifier extends Notifier<UserState> {
   late final UserService _userService;
+  bool _hasInitialized = false;
 
   @override
   UserState build() {
     _userService = UserService();
-    // Auto-load users saat provider pertama kali dibuat
-    loadUsers();
+    // DO NOT auto-load here
     return const UserState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadUsers();
+    }
   }
 
   // Load all users with optional search
@@ -78,6 +84,7 @@ class UserNotifier extends Notifier<UserState> {
         isLoading: false,
         searchQuery: query ?? '',
       );
+      _hasInitialized = true;
     } catch (e) {
       state = UserState(
         users: state.users,

@@ -52,12 +52,19 @@ class PeminjamanState {
 // ============================================================================
 class PeminjamanNotifier extends Notifier<PeminjamanState> {
   late final PeminjamanService _peminjamanService;
+  bool _hasInitialized = false;
 
   @override
   PeminjamanState build() {
     _peminjamanService = PeminjamanService();
-    loadAllPeminjaman();
+    // DO NOT auto-load here
     return const PeminjamanState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadAllPeminjaman();
+    }
   }
 
   Future<void> loadAllPeminjaman() async {
@@ -67,6 +74,7 @@ class PeminjamanNotifier extends Notifier<PeminjamanState> {
       final peminjamans = await _peminjamanService.getAllPeminjaman();
 
       state = PeminjamanState(peminjamans: peminjamans, isLoading: false);
+      _hasInitialized = true;
     } catch (e) {
       state = PeminjamanState(
         peminjamans: state.peminjamans,
@@ -102,12 +110,19 @@ class PeminjamanNotifier extends Notifier<PeminjamanState> {
 // ============================================================================
 class PeminjamanMenungguNotifier extends Notifier<PeminjamanState> {
   late final PeminjamanService _peminjamanService;
+  bool _hasInitialized = false;
 
   @override
   PeminjamanState build() {
     _peminjamanService = PeminjamanService();
-    loadPeminjamanMenunggu();
+    // DO NOT auto-load here
     return const PeminjamanState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadPeminjamanMenunggu();
+    }
   }
 
   Future<void> loadPeminjamanMenunggu() async {
@@ -117,6 +132,7 @@ class PeminjamanMenungguNotifier extends Notifier<PeminjamanState> {
       final peminjamans = await _peminjamanService.getAllPeminjamanMenunggu();
 
       state = PeminjamanState(peminjamans: peminjamans, isLoading: false);
+      _hasInitialized = true;
     } catch (e) {
       state = PeminjamanState(
         peminjamans: state.peminjamans,
@@ -184,12 +200,19 @@ class PeminjamanMenungguNotifier extends Notifier<PeminjamanState> {
 // ============================================================================
 class PeminjamanAktifNotifier extends Notifier<PeminjamanState> {
   late final PeminjamanService _peminjamanService;
+  bool _hasInitialized = false;
 
   @override
   PeminjamanState build() {
     _peminjamanService = PeminjamanService();
-    loadPeminjamanAktif();
+    // DO NOT auto-load here
     return const PeminjamanState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadPeminjamanAktif();
+    }
   }
 
   Future<void> loadPeminjamanAktif() async {
@@ -199,6 +222,7 @@ class PeminjamanAktifNotifier extends Notifier<PeminjamanState> {
       final peminjamans = await _peminjamanService.getAllPeminjamanAktif();
 
       state = PeminjamanState(peminjamans: peminjamans, isLoading: false);
+      _hasInitialized = true;
     } catch (e) {
       state = PeminjamanState(
         peminjamans: state.peminjamans,
@@ -222,18 +246,22 @@ class PeminjamanAktifNotifier extends Notifier<PeminjamanState> {
 // ============================================================================
 class MyPeminjamanNotifier extends Notifier<PeminjamanState> {
   late final PeminjamanService _peminjamanService;
+  bool _hasInitialized = false;
 
   @override
   PeminjamanState build() {
     _peminjamanService = PeminjamanService();
-
-    // Get current user ID dari auth provider
-    final userId = ref.watch(currentUserIdProvider);
-    if (userId != null) {
-      loadMyPeminjaman(userId);
-    }
-
+    // DO NOT auto-load here
     return const PeminjamanState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      final userId = ref.read(currentUserIdProvider);
+      if (userId != null) {
+        loadMyPeminjaman(userId);
+      }
+    }
   }
 
   Future<void> loadMyPeminjaman(int userId) async {
@@ -243,6 +271,7 @@ class MyPeminjamanNotifier extends Notifier<PeminjamanState> {
       final peminjamans = await _peminjamanService.getPeminjamanByUser(userId);
 
       state = PeminjamanState(peminjamans: peminjamans, isLoading: false);
+      _hasInitialized = true;
     } catch (e) {
       state = PeminjamanState(
         peminjamans: state.peminjamans,

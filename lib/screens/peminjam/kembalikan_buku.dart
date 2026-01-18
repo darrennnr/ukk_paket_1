@@ -22,6 +22,7 @@ class KembalikanBukuScreen extends ConsumerStatefulWidget {
 class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _searchQuery = '';
+  bool _hasInitializedProviders = false;
 
   bool get _isDesktop => MediaQuery.of(context).size.width >= 900;
   bool get _isTablet =>
@@ -31,15 +32,28 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    // Provider initialization is now done in build method when auth is ready
+  }
+
+  void _initializeProviders() {
+    if (!_hasInitializedProviders) {
+      _hasInitializedProviders = true;
       ref.read(myPeminjamanProvider.notifier).refresh();
-    });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
     final peminjamanState = ref.watch(myPeminjamanProvider);
-    final user = ref.watch(authProvider).user;
+    final user = authState.user;
+
+    // Wait for auth to complete before initializing providers
+    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeProviders();
+      });
+    }
 
     // Filter hanya peminjaman yang sedang dipinjam (status 2 atau 5)
     final activePeminjaman = peminjamanState.peminjamans.where((p) {

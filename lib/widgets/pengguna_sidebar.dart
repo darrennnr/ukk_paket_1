@@ -194,10 +194,15 @@ class PenggunaSidebar extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: () {
-            // Only navigate if not already on this route to prevent unnecessary rebuilds
-            if (currentRoute != route) {
-              context.go(route);
+            // If already on this route, just close drawer if open and return
+            if (currentRoute == route) {
+              if (isDrawerMode) {
+                Navigator.pop(context);
+              }
+              return;
             }
+            // Navigate to new route
+            context.go(route);
             if (isDrawerMode) {
               Navigator.pop(context);
             }

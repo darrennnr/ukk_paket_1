@@ -54,13 +54,19 @@ class KategoriState {
 // ============================================================================
 class KategoriNotifier extends Notifier<KategoriState> {
   late final KategoriService _kategoriService;
+  bool _hasInitialized = false;
 
   @override
   KategoriState build() {
     _kategoriService = KategoriService();
-    // Auto-load kategoris saat provider pertama kali dibuat
-    loadKategoris();
+    // DO NOT auto-load here
     return const KategoriState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadKategoris();
+    }
   }
 
   // Load all kategoris
@@ -71,6 +77,7 @@ class KategoriNotifier extends Notifier<KategoriState> {
       final kategoris = await _kategoriService.getAllKategori();
 
       state = KategoriState(kategoris: kategoris, isLoading: false);
+      _hasInitialized = true;
     } catch (e) {
       state = KategoriState(
         kategoris: state.kategoris,

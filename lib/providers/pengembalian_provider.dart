@@ -51,12 +51,19 @@ class PengembalianState {
 // ============================================================================
 class PengembalianNotifier extends Notifier<PengembalianState> {
   late final PengembalianService _pengembalianService;
+  bool _hasInitialized = false;
 
   @override
   PengembalianState build() {
     _pengembalianService = PengembalianService();
-    loadAllPengembalian();
+    // DO NOT auto-load here
     return const PengembalianState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadAllPengembalian();
+    }
   }
 
   Future<void> loadAllPengembalian() async {
@@ -66,6 +73,7 @@ class PengembalianNotifier extends Notifier<PengembalianState> {
       final pengembalians = await _pengembalianService.getAllPengembalian();
 
       state = PengembalianState(pengembalians: pengembalians, isLoading: false);
+      _hasInitialized = true;
     } catch (e) {
       state = PengembalianState(
         pengembalians: state.pengembalians,
@@ -186,12 +194,19 @@ class PengembalianNotifier extends Notifier<PengembalianState> {
 // ============================================================================
 class PengembalianBelumLunasNotifier extends Notifier<PengembalianState> {
   late final PengembalianService _pengembalianService;
+  bool _hasInitialized = false;
 
   @override
   PengembalianState build() {
     _pengembalianService = PengembalianService();
-    loadPengembalianBelumLunas();
+    // DO NOT auto-load here
     return const PengembalianState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadPengembalianBelumLunas();
+    }
   }
 
   Future<void> loadPengembalianBelumLunas() async {
@@ -202,6 +217,7 @@ class PengembalianBelumLunasNotifier extends Notifier<PengembalianState> {
           .getPengembalianBelumLunas();
 
       state = PengembalianState(pengembalians: pengembalians, isLoading: false);
+      _hasInitialized = true;
     } catch (e) {
       state = PengembalianState(
         pengembalians: state.pengembalians,

@@ -20,6 +20,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String _searchQuery = '';
   int? _selectedKategoriId;
+  bool _hasInitializedProviders = false;
 
   bool get _isDesktop => MediaQuery.of(context).size.width >= 900;
   bool get _isTablet => MediaQuery.of(context).size.width >= 600 && MediaQuery.of(context).size.width < 900;
@@ -27,15 +28,28 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(alatTersediaProvider.notifier).refresh();
-    });
+    // Provider initialization is now done in build method when auth is ready
+  }
+
+  void _initializeProviders() {
+    if (!_hasInitializedProviders) {
+      _hasInitializedProviders = true;
+      ref.read(alatTersediaProvider.notifier).ensureInitialized();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
     final alatState = ref.watch(alatTersediaProvider);
-    final user = ref.watch(authProvider).user;
+    final user = authState.user;
+
+    // Wait for auth to complete before initializing providers
+    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeProviders();
+      });
+    }
 
     // Filter buku berdasarkan search dan kategori
     final filteredBooks = alatState.alats.where((book) {

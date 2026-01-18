@@ -33,22 +33,27 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
   final TextEditingController _keperluanController = TextEditingController();
 
   bool _isSubmitting = false;
+  bool _hasInitializedProviders = false;
 
   bool get _isDesktop => MediaQuery.of(context).size.width >= 900;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref.read(alatTersediaProvider.notifier).refresh();
-    });
-
     // Set selected book if bookId is provided from URL query parameter
     if (widget.bookId != null) {
       final bookIdInt = int.tryParse(widget.bookId!);
       if (bookIdInt != null) {
         _selectedBukuId = bookIdInt;
       }
+    }
+    // Provider initialization is now done in build method when auth is ready
+  }
+
+  void _initializeProviders() {
+    if (!_hasInitializedProviders) {
+      _hasInitializedProviders = true;
+      ref.read(alatTersediaProvider.notifier).refresh();
     }
   }
 
@@ -61,8 +66,16 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
     final alatState = ref.watch(alatTersediaProvider);
-    final user = ref.watch(authProvider).user;
+    final user = authState.user;
+
+    // Wait for auth to complete before initializing providers
+    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeProviders();
+      });
+    }
 
     return Scaffold(
       key: _scaffoldKey,

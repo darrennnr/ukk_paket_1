@@ -63,13 +63,19 @@ class AlatState {
 // ============================================================================
 class AlatNotifier extends Notifier<AlatState> {
   late final AlatService _alatService;
+  bool _hasInitialized = false;
 
   @override
   AlatState build() {
     _alatService = AlatService();
-    // Auto-load alats saat provider pertama kali dibuat
-    loadAlats();
+    // DO NOT auto-load here
     return const AlatState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadAlats();
+    }
   }
 
   // Load all alats with filters
@@ -88,6 +94,7 @@ class AlatNotifier extends Notifier<AlatState> {
         searchQuery: search ?? '',
         selectedKategoriId: kategoriId,
       );
+      _hasInitialized = true;
     } catch (e) {
       state = AlatState(
         alats: state.alats,
@@ -214,12 +221,19 @@ class AlatNotifier extends Notifier<AlatState> {
 // ============================================================================
 class AlatTersediaNotifier extends Notifier<AlatState> {
   late final AlatService _alatService;
+  bool _hasInitialized = false;
 
   @override
   AlatState build() {
     _alatService = AlatService();
-    loadAlatTersedia();
+    // DO NOT auto-load here
     return const AlatState();
+  }
+
+  void ensureInitialized() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadAlatTersedia();
+    }
   }
 
   Future<void> loadAlatTersedia() async {
@@ -229,6 +243,7 @@ class AlatTersediaNotifier extends Notifier<AlatState> {
       final alats = await _alatService.getAlatTersedia();
 
       state = AlatState(alats: alats, isLoading: false);
+      _hasInitialized = true;
     } catch (e) {
       state = AlatState(
         alats: state.alats,

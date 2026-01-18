@@ -180,6 +180,56 @@ class PengembalianNotifier extends Notifier<PengembalianState> {
     }
   }
 
+  // Update pengembalian
+  Future<bool> updatePengembalian(
+    int pengembalianId, {
+    String? kondisiAlat,
+    String? catatan,
+    String? statusPembayaran,
+    required int petugasId,
+  }) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      await _pengembalianService.updatePengembalian(
+        pengembalianId,
+        kondisiAlat: kondisiAlat,
+        catatan: catatan,
+        statusPembayaran: statusPembayaran,
+        petugasId: petugasId,
+      );
+
+      await loadAllPengembalian();
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal update pengembalian: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  // Delete pengembalian
+  Future<bool> deletePengembalian(int pengembalianId, int petugasId) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      await _pengembalianService.deletePengembalian(pengembalianId, petugasId);
+
+      await loadAllPengembalian();
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal hapus pengembalian: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
   Future<void> refresh() async {
     await loadAllPengembalian();
   }

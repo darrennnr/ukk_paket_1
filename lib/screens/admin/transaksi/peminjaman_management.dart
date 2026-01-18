@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/peminjaman_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
+import 'package:paket_3_training/providers/alat_provider.dart';
+import 'package:paket_3_training/providers/user_provider.dart';
 import 'package:paket_3_training/models/peminjaman_model.dart';
+import 'package:paket_3_training/models/alat_model.dart';
+import 'package:paket_3_training/models/user_model.dart';
 
 class PeminjamanManagement extends ConsumerStatefulWidget {
   const PeminjamanManagement({Key? key}) : super(key: key);
@@ -332,25 +337,45 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
   // HEADER
   // ============================================================================
   Widget _buildHeader(String title, int count) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1A1A),
-            letterSpacing: -0.3,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A1A),
+                letterSpacing: -0.3,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$count data ditemukan',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          '$count data ditemukan',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-            fontWeight: FontWeight.w500,
+        ElevatedButton.icon(
+          onPressed: () => _showCreateDialog(),
+          icon: const Icon(Icons.add_rounded, size: 18),
+          label: const Text('Tambah Peminjaman'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         ),
       ],
@@ -745,6 +770,55 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                     () => _showDetailDialog(peminjaman),
                                   ),
                                 ),
+                                // Edit - only for pending
+                                if (peminjaman.statusPeminjamanId == 1)
+                                  PopupMenuItem(
+                                    height: 36,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.edit_outlined,
+                                          size: 16,
+                                          color: Colors.grey.shade700,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Text(
+                                          'Edit',
+                                          style: TextStyle(fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () => Future.delayed(
+                                      Duration.zero,
+                                      () => _showEditDialog(peminjaman),
+                                    ),
+                                  ),
+                                // Delete - only for pending
+                                if (peminjaman.statusPeminjamanId == 1)
+                                  PopupMenuItem(
+                                    height: 36,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.delete_outline_rounded,
+                                          size: 16,
+                                          color: const Color(0xFFFF5252),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        const Text(
+                                          'Hapus',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Color(0xFFFF5252),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () => Future.delayed(
+                                      Duration.zero,
+                                      () => _showDeleteDialog(peminjaman),
+                                    ),
+                                  ),
                               ],
                             ),
                           ],
@@ -1525,5 +1599,799 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
         )
         .animate(onPlay: (controller) => controller.repeat())
         .shimmer(duration: 1200.ms);
+  }
+
+  // ============================================================================
+  // CREATE DIALOG
+  // ============================================================================
+  void _showCreateDialog() {
+    // Ensure data is loaded
+    ref.read(alatTersediaProvider.notifier).ensureInitialized();
+    ref.read(userProvider.notifier).ensureInitialized();
+
+    int? selectedPeminjamId;
+    int? selectedAlatId;
+    int jumlahPinjam = 1;
+    DateTime tanggalBerakhir = DateTime.now().add(const Duration(days: 7));
+    final keperluanController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final alatsState = ref.watch(alatTersediaProvider);
+          final usersState = ref.watch(userProvider);
+
+          // Filter users to show only peminjam (role_id = 3)
+          final peminjamList = usersState.users
+              .where((u) => u.roleId == 3)
+              .toList();
+
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: _isDesktop ? 500 : double.infinity,
+                maxHeight: MediaQuery.of(context).size.height * 0.85,
+              ),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.add_circle_outline_rounded,
+                              color: AppTheme.primaryColor,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Tambah Peminjaman',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close_rounded, size: 20),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Form Content
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Peminjam Dropdown
+                            _buildFormLabel('Peminjam'),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<int>(
+                              value: selectedPeminjamId,
+                              decoration: _inputDecoration('Pilih peminjam'),
+                              items: peminjamList
+                                  .map((u) => DropdownMenuItem(
+                                        value: u.userId,
+                                        child: Text(
+                                          u.namaLengkap,
+                                          style: const TextStyle(fontSize: 13),
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChanged: (v) =>
+                                  setDialogState(() => selectedPeminjamId = v),
+                              validator: (v) =>
+                                  v == null ? 'Pilih peminjam' : null,
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Alat Dropdown
+                            _buildFormLabel('Alat'),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<int>(
+                              value: selectedAlatId,
+                              decoration: _inputDecoration('Pilih alat'),
+                              items: alatsState.alats
+                                  .map((a) => DropdownMenuItem(
+                                        value: a.alatId,
+                                        child: Text(
+                                          '${a.namaAlat} (Stok: ${a.jumlahTersedia})',
+                                          style: const TextStyle(fontSize: 13),
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChanged: (v) =>
+                                  setDialogState(() => selectedAlatId = v),
+                              validator: (v) => v == null ? 'Pilih alat' : null,
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Jumlah Pinjam
+                            _buildFormLabel('Jumlah Pinjam'),
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              initialValue: jumlahPinjam.toString(),
+                              keyboardType: TextInputType.number,
+                              decoration: _inputDecoration('1'),
+                              style: const TextStyle(fontSize: 13),
+                              onChanged: (v) {
+                                jumlahPinjam = int.tryParse(v) ?? 1;
+                              },
+                              validator: (v) {
+                                if (v == null || v.isEmpty) {
+                                  return 'Masukkan jumlah';
+                                }
+                                final num = int.tryParse(v);
+                                if (num == null || num < 1) {
+                                  return 'Minimal 1';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Tanggal Berakhir
+                            _buildFormLabel('Tanggal Berakhir'),
+                            const SizedBox(height: 8),
+                            InkWell(
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: tanggalBerakhir,
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime.now()
+                                      .add(const Duration(days: 365)),
+                                );
+                                if (picked != null) {
+                                  setDialogState(() => tanggalBerakhir = picked);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 14,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  border: Border.all(color: Colors.grey.shade200),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today_outlined,
+                                      size: 16,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      DateFormat('dd MMMM yyyy')
+                                          .format(tanggalBerakhir),
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Keperluan
+                            _buildFormLabel('Keperluan'),
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              controller: keperluanController,
+                              maxLines: 3,
+                              decoration: _inputDecoration(
+                                'Masukkan keperluan peminjaman',
+                              ),
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Actions
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                side: BorderSide(color: Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Batal',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (!formKey.currentState!.validate()) return;
+                                if (selectedPeminjamId == null ||
+                                    selectedAlatId == null) {
+                                  return;
+                                }
+
+                                Navigator.pop(context);
+
+                                final peminjaman = PeminjamanModel(
+                                  peminjamanId: 0,
+                                  peminjamId: selectedPeminjamId,
+                                  alatId: selectedAlatId,
+                                  kodePeminjaman:
+                                      'PMJ-${const Uuid().v4().substring(0, 8).toUpperCase()}',
+                                  jumlahPinjam: jumlahPinjam,
+                                  tanggalBerakhir: tanggalBerakhir,
+                                  keperluan: keperluanController.text.isEmpty
+                                      ? null
+                                      : keperluanController.text,
+                                  statusPeminjamanId: 1,
+                                );
+
+                                final success = await ref
+                                    .read(peminjamanProvider.notifier)
+                                    .createPeminjaman(peminjaman);
+
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        success
+                                            ? 'Peminjaman berhasil ditambahkan'
+                                            : 'Gagal menambah peminjaman',
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                      backgroundColor: success
+                                          ? const Color(0xFF4CAF50)
+                                          : const Color(0xFFFF5252),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primaryColor,
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Simpan',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ============================================================================
+  // EDIT DIALOG
+  // ============================================================================
+  void _showEditDialog(PeminjamanModel peminjaman) {
+    ref.read(alatTersediaProvider.notifier).ensureInitialized();
+
+    int? selectedAlatId = peminjaman.alatId;
+    int jumlahPinjam = peminjaman.jumlahPinjam;
+    DateTime tanggalBerakhir = peminjaman.tanggalBerakhir;
+    final keperluanController =
+        TextEditingController(text: peminjaman.keperluan ?? '');
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final alatsState = ref.watch(alatTersediaProvider);
+
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: _isDesktop ? 500 : double.infinity,
+                maxHeight: MediaQuery.of(context).size.height * 0.85,
+              ),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2196F3).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.edit_outlined,
+                              color: Color(0xFF2196F3),
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Edit Peminjaman',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  peminjaman.kodePeminjaman,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close_rounded, size: 20),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Form Content
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Alat Dropdown
+                            _buildFormLabel('Alat'),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<int>(
+                              value: selectedAlatId,
+                              decoration: _inputDecoration('Pilih alat'),
+                              items: alatsState.alats
+                                  .map((a) => DropdownMenuItem(
+                                        value: a.alatId,
+                                        child: Text(
+                                          '${a.namaAlat} (Stok: ${a.jumlahTersedia})',
+                                          style: const TextStyle(fontSize: 13),
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChanged: (v) =>
+                                  setDialogState(() => selectedAlatId = v),
+                              validator: (v) => v == null ? 'Pilih alat' : null,
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Jumlah Pinjam
+                            _buildFormLabel('Jumlah Pinjam'),
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              initialValue: jumlahPinjam.toString(),
+                              keyboardType: TextInputType.number,
+                              decoration: _inputDecoration('1'),
+                              style: const TextStyle(fontSize: 13),
+                              onChanged: (v) {
+                                jumlahPinjam = int.tryParse(v) ?? 1;
+                              },
+                              validator: (v) {
+                                if (v == null || v.isEmpty) {
+                                  return 'Masukkan jumlah';
+                                }
+                                final num = int.tryParse(v);
+                                if (num == null || num < 1) return 'Minimal 1';
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Tanggal Berakhir
+                            _buildFormLabel('Tanggal Berakhir'),
+                            const SizedBox(height: 8),
+                            InkWell(
+                              onTap: () async {
+                                final picked = await showDatePicker(
+                                  context: context,
+                                  initialDate: tanggalBerakhir,
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime.now()
+                                      .add(const Duration(days: 365)),
+                                );
+                                if (picked != null) {
+                                  setDialogState(() => tanggalBerakhir = picked);
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 14,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  border:
+                                      Border.all(color: Colors.grey.shade200),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.calendar_today_outlined,
+                                      size: 16,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      DateFormat('dd MMMM yyyy')
+                                          .format(tanggalBerakhir),
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Keperluan
+                            _buildFormLabel('Keperluan'),
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              controller: keperluanController,
+                              maxLines: 3,
+                              decoration: _inputDecoration(
+                                'Masukkan keperluan peminjaman',
+                              ),
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Actions
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                side: BorderSide(color: Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Batal',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (!formKey.currentState!.validate()) return;
+
+                                Navigator.pop(context);
+
+                                final updated = peminjaman.copyWith(
+                                  alatId: selectedAlatId,
+                                  jumlahPinjam: jumlahPinjam,
+                                  tanggalBerakhir: tanggalBerakhir,
+                                  keperluan: keperluanController.text.isEmpty
+                                      ? null
+                                      : keperluanController.text,
+                                );
+
+                                final success = await ref
+                                    .read(peminjamanProvider.notifier)
+                                    .updatePeminjaman(updated);
+
+                                // Refresh other providers as well
+                                ref
+                                    .read(peminjamanMenungguProvider.notifier)
+                                    .refresh();
+
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        success
+                                            ? 'Peminjaman berhasil diperbarui'
+                                            : 'Gagal memperbarui peminjaman',
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                      backgroundColor: success
+                                          ? const Color(0xFF4CAF50)
+                                          : const Color(0xFFFF5252),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2196F3),
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Simpan',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ============================================================================
+  // DELETE DIALOG
+  // ============================================================================
+  void _showDeleteDialog(PeminjamanModel peminjaman) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.all(20),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF5252).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                color: Color(0xFFFF5252),
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Hapus Peminjaman?',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Peminjaman dengan kode "${peminjaman.kodePeminjaman}" akan dihapus permanen.',
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Colors.grey.shade300),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Batal',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      final userId = ref.read(authProvider).user?.userId;
+                      if (userId == null) return;
+
+                      final success = await ref
+                          .read(peminjamanProvider.notifier)
+                          .deletePeminjaman(peminjaman.peminjamanId, userId);
+
+                      // Refresh other providers
+                      ref.read(peminjamanMenungguProvider.notifier).refresh();
+
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? 'Peminjaman berhasil dihapus'
+                                  : 'Gagal menghapus peminjaman',
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                            backgroundColor: success
+                                ? const Color(0xFF4CAF50)
+                                : const Color(0xFFFF5252),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF5252),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Hapus',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================================
+  // HELPER WIDGETS
+  // ============================================================================
+  Widget _buildFormLabel(String label) {
+    return Text(
+      label,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF1A1A1A),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: AppTheme.primaryColor, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xFFFF5252)),
+      ),
+    );
   }
 }

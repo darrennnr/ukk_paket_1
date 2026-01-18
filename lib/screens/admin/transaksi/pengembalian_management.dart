@@ -6,8 +6,10 @@ import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/pengembalian_provider.dart';
+import 'package:paket_3_training/providers/peminjaman_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
 import 'package:paket_3_training/models/pengembalian_model.dart';
+import 'package:paket_3_training/models/peminjaman_model.dart' as pnj;
 
 class PengembalianManagement extends ConsumerStatefulWidget {
   const PengembalianManagement({Key? key}) : super(key: key);
@@ -291,25 +293,45 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
   // HEADER & FILTER LOGIC
   // ============================================================================
   Widget _buildHeader(String title, int count) {
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1A1A),
-            letterSpacing: -0.3,
-          ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A1A),
+                letterSpacing: -0.3,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$count data ditemukan',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          '$count data ditemukan',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey.shade600,
-            fontWeight: FontWeight.w500,
+        ElevatedButton.icon(
+          onPressed: () => _showCreateDialog(),
+          icon: const Icon(Icons.assignment_return_outlined, size: 18),
+          label: const Text('Proses Pengembalian'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppTheme.primaryColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         ),
       ],
@@ -631,7 +653,7 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
             ),
             // Actions
             SizedBox(
-              width: isActionTab ? 100 : 50,
+              width: isActionTab ? 100 : 80,
               child: isActionTab
                   ? ElevatedButton(
                       onPressed: () => _processPaymentDialog(item),
@@ -651,15 +673,84 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
                         style: TextStyle(fontSize: 11, color: Colors.white),
                       ),
                     )
-                  : IconButton(
+                  : PopupMenuButton(
                       icon: Icon(
-                        Icons.visibility_outlined,
+                        Icons.more_vert_rounded,
                         size: 18,
-                        color: Colors.grey.shade500,
+                        color: Colors.grey.shade600,
                       ),
-                      onPressed: () => _showDetailDialog(item),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                      offset: const Offset(0, 35),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          height: 36,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.visibility_outlined,
+                                size: 16,
+                                color: Colors.grey.shade700,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Detail',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          onTap: () => Future.delayed(
+                            Duration.zero,
+                            () => _showDetailDialog(item),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          height: 36,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.edit_outlined,
+                                size: 16,
+                                color: Colors.grey.shade700,
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Edit',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                            ],
+                          ),
+                          onTap: () => Future.delayed(
+                            Duration.zero,
+                            () => _showEditDialog(item),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          height: 36,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.delete_outline_rounded,
+                                size: 16,
+                                color: const Color(0xFFFF5252),
+                              ),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Hapus',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFFFF5252),
+                                ),
+                              ),
+                            ],
+                          ),
+                          onTap: () => Future.delayed(
+                            Duration.zero,
+                            () => _showDeleteDialog(item),
+                          ),
+                        ),
+                      ],
                     ),
             ),
           ],
@@ -1286,5 +1377,741 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
         )
         .animate(onPlay: (controller) => controller.repeat())
         .shimmer(duration: 1200.ms);
+  }
+
+  // ============================================================================
+  // CREATE DIALOG (Proses Pengembalian)
+  // ============================================================================
+  void _showCreateDialog() {
+    // Ensure data is loaded
+    ref.read(peminjamanAktifProvider.notifier).ensureInitialized();
+
+    int? selectedPeminjamanId;
+    String kondisiAlat = 'Baik';
+    final catatanController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final peminjamanState = ref.watch(peminjamanAktifProvider);
+
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: _isDesktop ? 500 : double.infinity,
+                maxHeight: MediaQuery.of(context).size.height * 0.85,
+              ),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.assignment_return_outlined,
+                              color: AppTheme.primaryColor,
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Proses Pengembalian',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close_rounded, size: 20),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Form Content
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Peminjaman Aktif Dropdown
+                            _buildFormLabel('Peminjaman Aktif'),
+                            const SizedBox(height: 8),
+                            if (peminjamanState.isLoading)
+                              const CircularProgressIndicator()
+                            else if (peminjamanState.peminjamans.isEmpty)
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'Tidak ada peminjaman aktif',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF666666),
+                                  ),
+                                ),
+                              )
+                            else
+                              DropdownButtonFormField<int>(
+                                value: selectedPeminjamanId,
+                                decoration: _inputDecoration('Pilih peminjaman'),
+                                items: peminjamanState.peminjamans.map((p) {
+                                  return DropdownMenuItem(
+                                    value: p.peminjamanId,
+                                    child: Text(
+                                      '${p.kodePeminjaman} - ${p.peminjam?.namaLengkap ?? 'Unknown'}',
+                                      style: const TextStyle(fontSize: 13),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (v) => setDialogState(
+                                  () => selectedPeminjamanId = v,
+                                ),
+                                validator: (v) =>
+                                    v == null ? 'Pilih peminjaman' : null,
+                              ),
+                            const SizedBox(height: 16),
+
+                            // Kondisi Alat
+                            _buildFormLabel('Kondisi Alat'),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<String>(
+                              value: kondisiAlat,
+                              decoration: _inputDecoration('Pilih kondisi'),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'Baik',
+                                  child: Text(
+                                    'Baik',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Rusak',
+                                  child: Text(
+                                    'Rusak',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Hilang',
+                                  child: Text(
+                                    'Hilang',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setDialogState(() => kondisiAlat = v);
+                                }
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Catatan
+                            _buildFormLabel('Catatan (Opsional)'),
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              controller: catatanController,
+                              maxLines: 3,
+                              decoration: _inputDecoration(
+                                'Masukkan catatan pengembalian',
+                              ),
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Actions
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                side: BorderSide(color: Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Batal',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: peminjamanState.peminjamans.isEmpty
+                                  ? null
+                                  : () async {
+                                      if (!formKey.currentState!.validate()) {
+                                        return;
+                                      }
+                                      if (selectedPeminjamanId == null) return;
+
+                                      Navigator.pop(context);
+
+                                      final petugasId =
+                                          ref.read(authProvider).user?.userId;
+                                      if (petugasId == null) return;
+
+                                      final success = await ref
+                                          .read(pengembalianProvider.notifier)
+                                          .prosesPengembalian(
+                                            peminjamanId: selectedPeminjamanId!,
+                                            petugasId: petugasId,
+                                            kondisiAlat: kondisiAlat,
+                                            catatan: catatanController
+                                                    .text.isEmpty
+                                                ? null
+                                                : catatanController.text,
+                                          );
+
+                                      // Refresh related providers
+                                      ref
+                                          .read(
+                                            peminjamanAktifProvider.notifier,
+                                          )
+                                          .refresh();
+                                      ref
+                                          .read(peminjamanProvider.notifier)
+                                          .refresh();
+
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              success
+                                                  ? 'Pengembalian berhasil diproses'
+                                                  : 'Gagal memproses pengembalian',
+                                              style:
+                                                  const TextStyle(fontSize: 13),
+                                            ),
+                                            backgroundColor: success
+                                                ? const Color(0xFF4CAF50)
+                                                : const Color(0xFFFF5252),
+                                            behavior: SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.primaryColor,
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Proses',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ============================================================================
+  // EDIT DIALOG
+  // ============================================================================
+  void _showEditDialog(PengembalianModel item) {
+    String kondisiAlat = item.kondisiAlat ?? 'Baik';
+    String statusPembayaran = item.statusPembayaran ?? 'Belum Lunas';
+    final catatanController = TextEditingController(text: item.catatan ?? '');
+    final formKey = GlobalKey<FormState>();
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: _isDesktop ? 500 : double.infinity,
+              ),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF2196F3).withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.edit_outlined,
+                              color: Color(0xFF2196F3),
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Edit Pengembalian',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  item.peminjaman?.kodePeminjaman ?? '-',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close_rounded, size: 20),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Form Content
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Kondisi Alat
+                          _buildFormLabel('Kondisi Alat'),
+                          const SizedBox(height: 8),
+                          DropdownButtonFormField<String>(
+                            value: kondisiAlat,
+                            decoration: _inputDecoration('Pilih kondisi'),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Baik',
+                                child: Text(
+                                  'Baik',
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Rusak',
+                                child: Text(
+                                  'Rusak',
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Hilang',
+                                child: Text(
+                                  'Hilang',
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                              ),
+                            ],
+                            onChanged: (v) {
+                              if (v != null) {
+                                setDialogState(() => kondisiAlat = v);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Status Pembayaran
+                          _buildFormLabel('Status Pembayaran'),
+                          const SizedBox(height: 8),
+                          DropdownButtonFormField<String>(
+                            value: statusPembayaran,
+                            decoration: _inputDecoration('Pilih status'),
+                            items: const [
+                              DropdownMenuItem(
+                                value: 'Belum Lunas',
+                                child: Text(
+                                  'Belum Lunas',
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                              ),
+                              DropdownMenuItem(
+                                value: 'Lunas',
+                                child: Text(
+                                  'Lunas',
+                                  style: TextStyle(fontSize: 13),
+                                ),
+                              ),
+                            ],
+                            onChanged: (v) {
+                              if (v != null) {
+                                setDialogState(() => statusPembayaran = v);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Catatan
+                          _buildFormLabel('Catatan'),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: catatanController,
+                            maxLines: 3,
+                            decoration: _inputDecoration('Masukkan catatan'),
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Actions
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                side: BorderSide(color: Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Batal',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                Navigator.pop(context);
+
+                                final petugasId =
+                                    ref.read(authProvider).user?.userId;
+                                if (petugasId == null) return;
+
+                                final success = await ref
+                                    .read(pengembalianProvider.notifier)
+                                    .updatePengembalian(
+                                      item.pengembalianId,
+                                      kondisiAlat: kondisiAlat,
+                                      catatan: catatanController.text.isEmpty
+                                          ? null
+                                          : catatanController.text,
+                                      statusPembayaran: statusPembayaran,
+                                      petugasId: petugasId,
+                                    );
+
+                                // Refresh belum lunas provider
+                                ref
+                                    .read(
+                                      pengembalianBelumLunasProvider.notifier,
+                                    )
+                                    .refresh();
+
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        success
+                                            ? 'Pengembalian berhasil diperbarui'
+                                            : 'Gagal memperbarui pengembalian',
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                      backgroundColor: success
+                                          ? const Color(0xFF4CAF50)
+                                          : const Color(0xFFFF5252),
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2196F3),
+                                elevation: 0,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: const Text(
+                                'Simpan',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // ============================================================================
+  // DELETE DIALOG
+  // ============================================================================
+  void _showDeleteDialog(PengembalianModel item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        contentPadding: const EdgeInsets.all(20),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF5252).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                color: Color(0xFFFF5252),
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Hapus Pengembalian?',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Data pengembalian akan dihapus dan peminjaman akan kembali ke status aktif.',
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: Colors.grey.shade300),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Batal',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      final petugasId = ref.read(authProvider).user?.userId;
+                      if (petugasId == null) return;
+
+                      final success = await ref
+                          .read(pengembalianProvider.notifier)
+                          .deletePengembalian(item.pengembalianId, petugasId);
+
+                      // Refresh related providers
+                      ref.read(pengembalianBelumLunasProvider.notifier).refresh();
+                      ref.read(peminjamanAktifProvider.notifier).refresh();
+                      ref.read(peminjamanProvider.notifier).refresh();
+
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              success
+                                  ? 'Pengembalian berhasil dihapus'
+                                  : 'Gagal menghapus pengembalian',
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                            backgroundColor: success
+                                ? const Color(0xFF4CAF50)
+                                : const Color(0xFFFF5252),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF5252),
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Hapus',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ============================================================================
+  // HELPER WIDGETS
+  // ============================================================================
+  Widget _buildFormLabel(String label) {
+    return Text(
+      label,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF1A1A1A),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: AppTheme.primaryColor, width: 1.5),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Color(0xFFFF5252)),
+      ),
+    );
   }
 }

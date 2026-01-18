@@ -153,4 +153,76 @@ class PengembalianService {
         .map((e) => PengembalianModel.fromJson(e))
         .toList();
   }
+
+  // Update Pengembalian
+  Future<void> updatePengembalian(
+    int pengembalianId, {
+    String? kondisiAlat,
+    String? catatan,
+    String? statusPembayaran,
+    required int petugasId,
+  }) async {
+    final updateData = <String, dynamic>{};
+    if (kondisiAlat != null) updateData['kondisi_alat'] = kondisiAlat;
+    if (catatan != null) updateData['catatan'] = catatan;
+    if (statusPembayaran != null) {
+      updateData['status_pembayaran'] = statusPembayaran;
+    }
+
+    if (updateData.isEmpty) return;
+
+    await supabase
+        .from(_table)
+        .update(updateData)
+        .eq('pengembalian_id', pengembalianId);
+
+    await _logService.logActivity(
+      userId: petugasId,
+      aktivitas: 'Update Pengembalian',
+      tabelTerkait: _table,
+      idTerkait: pengembalianId,
+      deskripsi: 'Data pengembalian diperbarui',
+    );
+  }
+
+  // Delete Pengembalian (rollback status peminjaman & stok alat)
+  Future<void> deletePengembalian(int pengembalianId, int petugasId) async {
+    // 1. Get pengembalian data
+    final pengembalianData = await supabase
+        .from(_table)
+        .select('*, peminjaman(*, alat(*))')
+        .eq('pengembalian_id', pengembalianId)
+        .single();
+
+    final peminjamanId = pengembalianData['peminjaman_id'] as int;
+    final jumlahKembali = pengembalianData['jumlah_kembali'] as int;
+    final peminjamanData =
+        pengembalianData['peminjaman'] as Map<String, dynamic>;
+    final alatData = peminjamanData['alat'] as Map<String, dynamic>;
+    final alatId = alatData['alat_id'] as int;
+    final currentStock = alatData['jumlah_tersedia'] as int;
+
+    // 2. Delete pengembalian record
+    await supabase.from(_table).delete().eq('pengembalian_id', pengembalianId);
+
+    // 3. Rollback peminjaman status to Dipinjam (ID 2)
+    await supabase
+        .from('peminjaman')
+        .update({'status_peminjaman_id': 2})
+        .eq('peminjaman_id', peminjamanId);
+
+    // 4. Rollback stok alat (kurangi karena alat kembali ke status dipinjam)
+    await supabase
+        .from('alat')
+        .update({'jumlah_tersedia': currentStock - jumlahKembali})
+        .eq('alat_id', alatId);
+
+    await _logService.logActivity(
+      userId: petugasId,
+      aktivitas: 'Hapus Pengembalian',
+      tabelTerkait: _table,
+      idTerkait: pengembalianId,
+      deskripsi: 'Pengembalian dihapus, peminjaman dikembalikan ke status aktif',
+    );
+  }
 }

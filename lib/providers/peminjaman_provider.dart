@@ -100,6 +100,60 @@ class PeminjamanNotifier extends Notifier<PeminjamanState> {
     await loadAllPeminjaman();
   }
 
+  // Admin: Create peminjaman langsung (skip approval)
+  Future<bool> createPeminjaman(PeminjamanModel peminjaman) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      await _peminjamanService.ajukanPeminjaman(peminjaman);
+      await loadAllPeminjaman();
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal membuat peminjaman: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  // Admin: Update peminjaman (hanya pending)
+  Future<bool> updatePeminjaman(PeminjamanModel peminjaman) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      await _peminjamanService.updatePeminjaman(peminjaman);
+      await loadAllPeminjaman();
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal update peminjaman: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  // Admin: Delete/Cancel peminjaman (hanya pending)
+  Future<bool> deletePeminjaman(int peminjamanId, int userId) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      await _peminjamanService.cancelPeminjaman(peminjamanId, userId);
+      await loadAllPeminjaman();
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal hapus peminjaman: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
   void clearError() {
     state = state.clearError();
   }

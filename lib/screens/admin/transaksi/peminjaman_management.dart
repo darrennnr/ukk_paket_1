@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
@@ -102,6 +103,9 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
   // APP BAR
   // ============================================================================
   PreferredSizeWidget _buildAppBar() {
+    final user = ref.watch(authProvider).user;
+    final userName = user?.namaLengkap ?? 'Admin';
+    
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.white,
@@ -125,11 +129,108 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           letterSpacing: -0.2,
         ),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+          child: _buildProfileMenu(userName),
+        ),
+      ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: Colors.grey.shade200),
       ),
     );
+  }
+
+  Widget _buildProfileMenu(String userName) {
+    return PopupMenuButton<String>(
+      offset: const Offset(0, 45),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  userName[0].toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            if (_isDesktop) ...[
+              const SizedBox(width: 8),
+              Text(
+                userName.split(' ').first,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1A1A1A),
+                ),
+              ),
+            ],
+            const SizedBox(width: 4),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 18,
+              color: Colors.grey.shade600,
+            ),
+          ],
+        ),
+      ),
+      onSelected: (value) {
+        if (value == 'logout') _handleLogout();
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 'profile',
+          height: 40,
+          child: Row(
+            children: [
+              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              const SizedBox(width: 10),
+              const Text('Profil', style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(height: 1),
+        PopupMenuItem(
+          value: 'logout',
+          height: 40,
+          child: Row(
+            children: [
+              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const SizedBox(width: 10),
+              const Text(
+                'Keluar',
+                style: TextStyle(fontSize: 13, color: Color(0xFFFF5252)),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleLogout() {
+    ref.read(authProvider.notifier).logout();
+    context.go('/login');
   }
 
   // ============================================================================

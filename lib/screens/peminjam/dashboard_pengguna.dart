@@ -312,7 +312,6 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
         ),
       ),
       onSelected: (value) {
-        if (value == 'history') _tabController.index = 3;
         if (value == 'logout') _handleLogout();
       },
       itemBuilder: (context) => [
@@ -328,21 +327,6 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
               ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'history',
-          height: 40,
-          child: Row(
-            children: [
-              Icon(
-                Icons.history_rounded,
-                size: 18,
-                color: Colors.grey.shade700,
-              ),
-              const SizedBox(width: 10),
-              const Text('History Peminjaman', style: TextStyle(fontSize: 13)),
             ],
           ),
         ),

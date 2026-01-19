@@ -270,31 +270,17 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
         ),
       ),
       onSelected: (value) {
-        if (value == 'dashboard') context.go('/peminjam/dashboard');
-        if (value == 'history') context.go('/peminjam/history');
         if (value == 'logout') _handleLogout();
       },
       itemBuilder: (context) => [
         PopupMenuItem(
-          value: 'dashboard',
+          value: 'profile',
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.dashboard_rounded,
-                  size: 18, color: Colors.grey.shade700),
+              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
               const SizedBox(width: 10),
-              const Text('Dashboard', style: TextStyle(fontSize: 13)),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: 'history',
-          height: 40,
-          child: Row(
-            children: [
-              Icon(Icons.history_rounded, size: 18, color: Colors.grey.shade700),
-              const SizedBox(width: 10),
-              const Text('History', style: TextStyle(fontSize: 13)),
+              const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
           ),
         ),
@@ -304,8 +290,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded,
-                  size: 18, color: Color(0xFFFF5252)),
+              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',

@@ -298,21 +298,6 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
             ],
           ),
         ),
-        PopupMenuItem(
-          value: 'settings',
-          height: 40,
-          child: Row(
-            children: [
-              Icon(
-                Icons.settings_outlined,
-                size: 18,
-                color: Colors.grey.shade700,
-              ),
-              const SizedBox(width: 10),
-              const Text('Pengaturan', style: TextStyle(fontSize: 13)),
-            ],
-          ),
-        ),
         const PopupMenuDivider(height: 1),
         PopupMenuItem(
           value: 'logout',

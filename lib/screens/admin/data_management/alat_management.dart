@@ -9,6 +9,7 @@ import 'package:paket_3_training/core/design_system/app_color.dart';
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/alat_provider.dart';
 import 'package:paket_3_training/providers/kategori_provider.dart';
+import 'package:paket_3_training/providers/auth_provider.dart';
 import 'package:paket_3_training/models/alat_model.dart';
 
 class AlatManagement extends ConsumerStatefulWidget {
@@ -100,6 +101,9 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
   // APP BAR
   // ============================================================================
   PreferredSizeWidget _buildAppBar() {
+    final user = ref.watch(authProvider).user;
+    final userName = user?.namaLengkap ?? 'Admin';
+
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.white,
@@ -123,11 +127,116 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
           letterSpacing: -0.2,
         ),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 12, top: 8, bottom: 8),
+          child: _buildProfileMenu(userName),
+        ),
+      ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
         child: Container(height: 1, color: Colors.grey.shade200),
       ),
     );
+  }
+
+  Widget _buildProfileMenu(String userName) {
+    return PopupMenuButton<String>(
+      offset: const Offset(0, 45),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 26,
+              height: 26,
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Text(
+                  userName[0].toUpperCase(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            if (_isDesktop) ...[
+              const SizedBox(width: 8),
+              Text(
+                userName.split(' ').first,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1A1A1A),
+                ),
+              ),
+            ],
+            const SizedBox(width: 4),
+            Icon(
+              Icons.keyboard_arrow_down_rounded,
+              size: 18,
+              color: Colors.grey.shade600,
+            ),
+          ],
+        ),
+      ),
+      onSelected: (value) {
+        if (value == 'logout') _handleLogout();
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 'profile',
+          height: 40,
+          child: Row(
+            children: [
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: Colors.grey.shade700,
+              ),
+              const SizedBox(width: 10),
+              const Text('Profil', style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ),
+        const PopupMenuDivider(height: 1),
+        PopupMenuItem(
+          value: 'logout',
+          height: 40,
+          child: Row(
+            children: [
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'Keluar',
+                style: TextStyle(fontSize: 13, color: Color(0xFFFF5252)),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _handleLogout() {
+    ref.read(authProvider.notifier).logout();
+    context.go('/login');
   }
 
   // ============================================================================
@@ -949,7 +1058,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
     );
     _fotoController = TextEditingController(text: widget.alat?.fotoAlat ?? '');
     _selectedKategoriId = widget.alat?.kategoriId;
-    _selectedKondisi = widget.alat?.kondisi ?? 'baik';
+    _selectedKondisi = (widget.alat?.kondisi ?? 'baik').toLowerCase().trim();
   }
 
   @override
@@ -1304,6 +1413,9 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
   }
 
   Widget _buildKondisiDropdown() {
+    // Normalisasi value untuk memastikan konsistensi
+    final normalizedValue = _selectedKondisi.toLowerCase().trim();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1317,7 +1429,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: _selectedKondisi,
+          value: normalizedValue,
           decoration: InputDecoration(
             filled: true,
             fillColor: Colors.grey.shade50,
@@ -1326,6 +1438,10 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
               vertical: 10,
             ),
             border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey.shade200),
+            ),
+            enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: Colors.grey.shade200),
             ),
@@ -1344,7 +1460,11 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
               child: Text('Rusak Berat', style: TextStyle(fontSize: 13)),
             ),
           ],
-          onChanged: (value) => setState(() => _selectedKondisi = value!),
+          onChanged: (value) {
+            if (value != null) {
+              setState(() => _selectedKondisi = value);
+            }
+          },
         ),
       ],
     );

@@ -211,18 +211,17 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
         ),
       ),
       onSelected: (value) {
-        if (value == 'dashboard') context.go('/peminjam/dashboard');
         if (value == 'logout') _handleLogout();
       },
       itemBuilder: (context) => [
         PopupMenuItem(
-          value: 'dashboard',
+          value: 'profile',
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.dashboard_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
               const SizedBox(width: 10),
-              const Text('Dashboard', style: TextStyle(fontSize: 13)),
+              const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
           ),
         ),

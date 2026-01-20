@@ -20,6 +20,7 @@ import 'package:paket_3_training/screens/peminjam/daftar_buku.dart';
 import 'package:paket_3_training/screens/peminjam/form_peminjaman.dart';
 import 'package:paket_3_training/screens/peminjam/history.dart';
 import 'package:paket_3_training/screens/peminjam/kembalikan_buku.dart';
+import 'package:paket_3_training/screens/petugas/laporan.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authNotifier = ref.watch(authProvider.notifier);
@@ -134,6 +135,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/petugas/pengembalian',
         builder: (context, state) => const PetugasPengembalianManagement(),
+      ),
+
+      GoRoute(
+        path: '/petugas/laporan',
+        builder: (context, state) => const LaporanPetugas(),
       ),
 
       // Peminjam Routes

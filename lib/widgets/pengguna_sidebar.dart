@@ -122,13 +122,13 @@ class PenggunaSidebar extends ConsumerWidget {
                     const SizedBox(height: 4),
 
                     // Ajukan Peminjaman
-                    _buildMenuItem(
-                      context,
-                      icon: Icons.add_circle_outline_rounded,
-                      title: 'Ajukan Peminjaman',
-                      route: '/peminjam/ajukan',
-                      isActive: currentRoute == '/peminjam/ajukan',
-                    ),
+                    // _buildMenuItem(
+                    //   context,
+                    //   icon: Icons.add_circle_outline_rounded,
+                    //   title: 'Ajukan Peminjaman',
+                    //   route: '/peminjam/ajukan',
+                    //   isActive: currentRoute == '/peminjam/ajukan',
+                    // ),
 
                     const SizedBox(height: 4),
 
@@ -277,9 +277,6 @@ class PenggunaSidebar extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: () {
-            if (isDrawerMode) {
-              Navigator.pop(context);
-            }
             _handleLogout(context, ref);
           },
           borderRadius: BorderRadius.circular(8),
@@ -386,8 +383,8 @@ class PenggunaSidebar extends ConsumerWidget {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    ref.read(authProvider.notifier).logout();
                     Navigator.pop(context);
+                    ref.read(authProvider.notifier).logout();
                     context.go('/login');
                   },
                   style: ElevatedButton.styleFrom(

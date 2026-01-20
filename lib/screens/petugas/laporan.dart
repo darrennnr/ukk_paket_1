@@ -1,6 +1,10 @@
 // lib/screens/petugas/laporan.dart
 import 'dart:convert';
-import 'dart:html' as html;
+import 'dart:io' show File, Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:path_provider/path_provider.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -685,7 +689,7 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
     }
   }
 
-  void _exportExcel(LaporanState state) {
+  Future<void> _exportExcel(LaporanState state) async {
     final service = ref.read(laporanServiceProvider);
     
     try {
@@ -700,16 +704,26 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
         filename = 'laporan_pengembalian_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
       }
 
-      // Download file for web
       final bytes = utf8.encode(csvData);
-      final blob = html.Blob([bytes]);
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      final anchor = html.AnchorElement(href: url)
-        ..setAttribute('download', filename)
-        ..click();
-      html.Url.revokeObjectUrl(url);
 
-      _showSnackBar('File $filename berhasil diunduh');
+      if (kIsWeb) {
+        // Download file for web
+        final blob = html.Blob([bytes]);
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute('download', filename)
+          ..click();
+        html.Url.revokeObjectUrl(url);
+        _showSnackBar('File $filename berhasil diunduh');
+      } else {
+        // For mobile, save to Downloads directory and open
+        final directory = await getApplicationDocumentsDirectory();
+        final filePath = '${directory.path}/$filename';
+        final file = File(filePath);
+        await file.writeAsBytes(bytes);
+        await OpenFilex.open(filePath);
+        _showSnackBar('File $filename berhasil disimpan');
+      }
     } catch (e) {
       _showSnackBar('Gagal export Excel: $e', isError: true);
     }

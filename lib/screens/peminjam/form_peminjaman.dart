@@ -365,8 +365,8 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Pilih Buku
-                  _buildFieldLabel('Pilih Buku', isRequired: true),
-                  const SizedBox(height: 8),
+                  // _buildFieldLabel('Pilih Buku', isRequired: true),
+                  // const SizedBox(height: 8),
                   _buildBookDropdown(alatState.alats),
                   const SizedBox(height: 20),
 

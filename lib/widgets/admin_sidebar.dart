@@ -171,16 +171,16 @@ class AdminSidebar extends ConsumerWidget {
                     // Laporan & Log (Admin Only)
                     if (roleName == 'admin') ...[
                       const SizedBox(height: 12),
-                      _buildSectionHeader('Laporan & Aktivitas'),
+                      _buildSectionHeader('Log Aktivitas'),
                       const SizedBox(height: 4),
 
-                      _buildMenuItem(
-                        context,
-                        icon: Icons.bar_chart_rounded,
-                        title: 'Laporan',
-                        route: '/admin/laporan',
-                        isActive: currentRoute == '/admin/laporan',
-                      ),
+                      // _buildMenuItem(
+                      //   context,
+                      //   icon: Icons.bar_chart_rounded,
+                      //   title: 'Laporan',
+                      //   route: '/admin/laporan',
+                      //   isActive: currentRoute == '/admin/laporan',
+                      // ),
 
                       _buildMenuItem(
                         context,
@@ -334,9 +334,6 @@ class AdminSidebar extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: () {
-            if (isDrawerMode) {
-              Navigator.pop(context);
-            }
             _handleLogout(context, ref);
           },
           borderRadius: BorderRadius.circular(8),
@@ -443,8 +440,8 @@ class AdminSidebar extends ConsumerWidget {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    ref.read(authProvider.notifier).logout();
                     Navigator.pop(context);
+                    ref.read(authProvider.notifier).logout();
                     context.go('/login');
                   },
                   style: ElevatedButton.styleFrom(

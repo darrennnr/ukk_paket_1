@@ -263,9 +263,6 @@ class PetugasSidebar extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: () {
-            if (isDrawerMode) {
-              Navigator.pop(context);
-            }
             _handleLogout(context, ref);
           },
           borderRadius: BorderRadius.circular(8),
@@ -357,8 +354,8 @@ class PetugasSidebar extends ConsumerWidget {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
-                    ref.read(authProvider.notifier).logout();
                     Navigator.pop(context);
+                    ref.read(authProvider.notifier).logout();
                     context.go('/login');
                   },
                   style: ElevatedButton.styleFrom(

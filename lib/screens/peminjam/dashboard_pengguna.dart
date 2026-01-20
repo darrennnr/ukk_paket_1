@@ -120,39 +120,39 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
                       bottom: BorderSide(color: Colors.grey.shade200, width: 1),
                     ),
                   ),
-                  child: TabBar(
-                    controller: _tabController,
-                    labelColor: AppTheme.primaryColor,
-                    unselectedLabelColor: Colors.grey.shade600,
-                    indicatorColor: AppTheme.primaryColor,
-                    indicatorSize: TabBarIndicatorSize.label,
-                    labelStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    unselectedLabelStyle: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    tabs: [
-                      Tab(
-                        text: 'Dashboard',
-                        icon: Icon(Icons.dashboard_rounded, size: 16),
-                      ),
-                      Tab(
-                        text: 'Daftar Buku',
-                        icon: Icon(Icons.menu_book_rounded, size: 16),
-                      ),
-                      Tab(
-                        text: 'Ajukan Pinjam',
-                        icon: Icon(Icons.add_circle_outline_rounded, size: 16),
-                      ),
-                      Tab(
-                        text: 'Kembalikan',
-                        icon: Icon(Icons.assignment_return_rounded, size: 16),
-                      ),
-                    ],
-                  ),
+                  // child: TabBar(
+                  //   controller: _tabController,
+                  //   labelColor: AppTheme.primaryColor,
+                  //   unselectedLabelColor: Colors.grey.shade600,
+                  //   indicatorColor: AppTheme.primaryColor,
+                  //   indicatorSize: TabBarIndicatorSize.label,
+                  //   labelStyle: const TextStyle(
+                  //     fontSize: 12,
+                  //     fontWeight: FontWeight.w600,
+                  //   ),
+                  //   unselectedLabelStyle: const TextStyle(
+                  //     fontSize: 12,
+                  //     fontWeight: FontWeight.w500,
+                  //   ),
+                  //   tabs: [
+                  //     Tab(
+                  //       text: 'Dashboard',
+                  //       icon: Icon(Icons.dashboard_rounded, size: 16),
+                  //     ),
+                  //     Tab(
+                  //       text: 'Daftar Buku',
+                  //       icon: Icon(Icons.menu_book_rounded, size: 16),
+                  //     ),
+                  //     Tab(
+                  //       text: 'Ajukan Pinjam',
+                  //       icon: Icon(Icons.add_circle_outline_rounded, size: 16),
+                  //     ),
+                  //     Tab(
+                  //       text: 'Kembalikan',
+                  //       icon: Icon(Icons.assignment_return_rounded, size: 16),
+                  //     ),
+                  //   ],
+                  // ),
                 ),
 
                 // Tab Content

@@ -367,8 +367,8 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
                   // Pilih Buku
                   // _buildFieldLabel('Pilih Buku', isRequired: true),
                   // const SizedBox(height: 8),
-                  _buildBookDropdown(alatState.alats),
-                  const SizedBox(height: 20),
+                  // _buildBookDropdown(alatState.alats),
+                  // const SizedBox(height: 20),
 
                   // Selected Book Preview
                   if (_selectedBukuId != null) ...[

@@ -1,16 +1,20 @@
 // lib/screens/admin/data_management/alat_management.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/services/storage_services.dart';
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/alat_provider.dart';
 import 'package:paket_3_training/providers/kategori_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
 import 'package:paket_3_training/models/alat_model.dart';
+import 'dart:typed_data';
 
 class AlatManagement extends ConsumerStatefulWidget {
   const AlatManagement({Key? key}) : super(key: key);
@@ -425,7 +429,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image
+                // Image Container with proper loading and error handling
                 Container(
                   height: 120,
                   decoration: BoxDecoration(
@@ -436,6 +440,8 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                   ),
                   child: Stack(
                     children: [
+                      // Display image if URL exists
+                      // Display image if URL exists
                       if (alat.fotoAlat != null && alat.fotoAlat!.isNotEmpty)
                         ClipRRect(
                           borderRadius: const BorderRadius.vertical(
@@ -446,16 +452,47 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                             width: double.infinity,
                             height: 120,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Center(
-                              child: Icon(
-                                Icons.inventory_2_outlined,
-                                size: 40,
-                                color: Colors.grey.shade400,
-                              ),
-                            ),
+                            headers: kIsWeb
+                                ? {'Cache-Control': 'no-cache'}
+                                : null,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                        : null,
+                                    color: AppTheme.primaryColor,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              // Print error for debugging
+                              if (kDebugMode) {
+                                print('❌ Image load error: $error');
+                              }
+                              return Center(
+                                child: Icon(
+                                  Icons.inventory_2_outlined,
+                                  size: 40,
+                                  color: Colors.grey.shade400,
+                                ),
+                              );
+                            },
                           ),
                         )
                       else
+                        // Show icon if no image
                         Center(
                           child: Icon(
                             Icons.inventory_2_outlined,
@@ -477,6 +514,13 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                                 ? const Color(0xFF4CAF50)
                                 : const Color(0xFFFF5252),
                             borderRadius: BorderRadius.circular(6),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Text(
                             isAvailable ? 'Tersedia' : 'Habis',
@@ -1037,10 +1081,17 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
   late TextEditingController _jumlahTotalController;
   late TextEditingController _jumlahTersediaController;
   late TextEditingController _hargaController;
-  late TextEditingController _fotoController;
+  late TextEditingController _fotoUrlController;
   int? _selectedKategoriId;
   String _selectedKondisi = 'baik';
   bool _isLoading = false;
+
+  // Image upload state
+  Uint8List? _selectedImageBytes;
+  String? _selectedImageName;
+  bool _useFileUpload = false;
+  final StorageService _storageService = StorageService();
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -1056,7 +1107,9 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
     _hargaController = TextEditingController(
       text: widget.alat?.hargaPerhari?.toString() ?? '',
     );
-    _fotoController = TextEditingController(text: widget.alat?.fotoAlat ?? '');
+    _fotoUrlController = TextEditingController(
+      text: widget.alat?.fotoAlat ?? '',
+    );
     _selectedKategoriId = widget.alat?.kategoriId;
     _selectedKondisi = (widget.alat?.kondisi ?? 'baik').toLowerCase().trim();
   }
@@ -1068,8 +1121,60 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
     _jumlahTotalController.dispose();
     _jumlahTersediaController.dispose();
     _hargaController.dispose();
-    _fotoController.dispose();
+    _fotoUrlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      print('🖼️ Opening image picker...');
+
+      final XFile? pickedFile = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (pickedFile != null) {
+        print('✅ Image picked: ${pickedFile.name}');
+
+        // Read file as bytes
+        final bytes = await pickedFile.readAsBytes();
+        print('📦 Image size: ${bytes.length} bytes');
+
+        setState(() {
+          _selectedImageBytes = bytes;
+          _selectedImageName = pickedFile.name;
+          _useFileUpload = true;
+        });
+
+        print('✅ Image state updated');
+      } else {
+        print('⚠️ No image selected');
+      }
+    } catch (e, stackTrace) {
+      print('❌ Pick image error: $e');
+      print('Stack trace: $stackTrace');
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal memilih gambar: ${e.toString()}'),
+            backgroundColor: const Color(0xFFFF5252),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  void _clearImage() {
+    setState(() {
+      _selectedImageBytes = null;
+      _selectedImageName = null;
+      _useFileUpload = false;
+    });
   }
 
   Future<void> _submit() async {
@@ -1077,44 +1182,88 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
 
     setState(() => _isLoading = true);
 
-    final alat = AlatModel(
-      alatId: widget.alat?.alatId ?? 0,
-      kodeAlat: _kodeController.text.trim(),
-      namaAlat: _namaController.text.trim(),
-      kategoriId: _selectedKategoriId,
-      kondisi: _selectedKondisi,
-      jumlahTotal: int.tryParse(_jumlahTotalController.text) ?? 0,
-      jumlahTersedia: int.tryParse(_jumlahTersediaController.text) ?? 0,
-      hargaPerhari: _hargaController.text.isNotEmpty
-          ? double.tryParse(_hargaController.text)
-          : null,
-      fotoAlat: _fotoController.text.trim().isEmpty
-          ? null
-          : _fotoController.text.trim(),
-    );
+    try {
+      String? imageUrl;
 
-    final success = widget.alat == null
-        ? await ref.read(alatProvider.notifier).createAlat(alat)
-        : await ref.read(alatProvider.notifier).updateAlat(alat);
+      // Upload image if file is selected
+      if (_useFileUpload &&
+          _selectedImageBytes != null &&
+          _selectedImageName != null) {
+        print('📤 Starting upload...');
+        print('File name: $_selectedImageName');
+        print('File size: ${_selectedImageBytes!.length} bytes');
 
-    if (mounted) {
-      setState(() => _isLoading = false);
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            success
-                ? '${widget.alat == null ? "Alat berhasil ditambahkan" : "Alat berhasil diperbarui"}'
-                : 'Gagal menyimpan alat',
-            style: const TextStyle(fontSize: 13),
-          ),
-          backgroundColor: success
-              ? const Color(0xFF4CAF50)
-              : const Color(0xFFFF5252),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        ),
+        imageUrl = await _storageService.uploadImage(
+          fileBytes: _selectedImageBytes!,
+          fileName: _selectedImageName!,
+        );
+
+        print('✅ Upload complete! URL: $imageUrl');
+      } else if (!_useFileUpload && _fotoUrlController.text.trim().isNotEmpty) {
+        // Use URL input
+        imageUrl = _fotoUrlController.text.trim();
+        print('🔗 Using URL: $imageUrl');
+      } else {
+        print('ℹ️ No image provided');
+      }
+
+      final alat = AlatModel(
+        alatId: widget.alat?.alatId ?? 0,
+        kodeAlat: _kodeController.text.trim(),
+        namaAlat: _namaController.text.trim(),
+        kategoriId: _selectedKategoriId,
+        kondisi: _selectedKondisi,
+        jumlahTotal: int.tryParse(_jumlahTotalController.text) ?? 0,
+        jumlahTersedia: int.tryParse(_jumlahTersediaController.text) ?? 0,
+        hargaPerhari: _hargaController.text.isNotEmpty
+            ? double.tryParse(_hargaController.text)
+            : null,
+        fotoAlat: imageUrl,
       );
+
+      print('💾 Saving alat with foto: ${alat.fotoAlat}');
+
+      final success = widget.alat == null
+          ? await ref.read(alatProvider.notifier).createAlat(alat)
+          : await ref
+                .read(alatProvider.notifier)
+                .updateAlat(alat, oldFotoUrl: widget.alat?.fotoAlat);
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? '${widget.alat == null ? "Alat berhasil ditambahkan" : "Alat berhasil diperbarui"}'
+                  : 'Gagal menyimpan alat',
+              style: const TextStyle(fontSize: 13),
+            ),
+            backgroundColor: success
+                ? const Color(0xFF4CAF50)
+                : const Color(0xFFFF5252),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        );
+      }
+    } catch (e, stackTrace) {
+      print('❌ Submit error: $e');
+      print('Stack trace: $stackTrace');
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: const Color(0xFFFF5252),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -1125,7 +1274,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 600),
+        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 650),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1224,11 +1373,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                         isNumber: true,
                       ),
                       const SizedBox(height: 16),
-                      _buildTextField(
-                        'URL Foto',
-                        _fotoController,
-                        'https://... (opsional)',
-                      ),
+                      _buildImageSection(),
                     ],
                   ),
                 ),
@@ -1296,6 +1441,181 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildImageSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Text(
+              'Foto Alat',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A1A),
+              ),
+            ),
+            const Spacer(),
+            // Toggle between file upload and URL
+            Row(
+              children: [
+                Text(
+                  _useFileUpload ? 'Upload File' : 'URL',
+                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                ),
+                const SizedBox(width: 4),
+                Switch(
+                  value: _useFileUpload,
+                  onChanged: (value) {
+                    setState(() {
+                      _useFileUpload = value;
+                      if (!value) {
+                        _clearImage();
+                      }
+                    });
+                  },
+                  activeColor: AppTheme.primaryColor,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        // Show file upload button if toggle is on
+        if (_useFileUpload) ...[
+          InkWell(
+            onTap: _pickImage,
+            borderRadius: BorderRadius.circular(8),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Column(
+                children: [
+                  if (_selectedImageBytes != null) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.memory(
+                        _selectedImageBytes!,
+                        height: 120,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _selectedImageName ?? '',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton.icon(
+                      onPressed: _clearImage,
+                      icon: const Icon(Icons.close_rounded, size: 16),
+                      label: const Text('Hapus'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFFFF5252),
+                        textStyle: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ] else ...[
+                    Icon(
+                      Icons.cloud_upload_outlined,
+                      size: 40,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Klik untuk upload foto',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'PNG, JPG (max. 5MB)',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ] else ...[
+          // Show URL input if toggle is off
+          TextFormField(
+            controller: _fotoUrlController,
+            style: const TextStyle(fontSize: 13),
+            decoration: InputDecoration(
+              hintText: 'https://... (opsional)',
+              hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+              filled: true,
+              fillColor: Colors.grey.shade50,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 10,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade200),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.grey.shade200),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(
+                  color: AppTheme.primaryColor,
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+          // Preview URL if exists
+          if (_fotoUrlController.text.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                _fotoUrlController.text,
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 120,
+                  color: Colors.grey.shade100,
+                  child: Center(
+                    child: Icon(
+                      Icons.broken_image_outlined,
+                      size: 40,
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ],
+      ],
     );
   }
 
@@ -1413,7 +1733,6 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
   }
 
   Widget _buildKondisiDropdown() {
-    // Normalisasi value untuk memastikan konsistensi
     final normalizedValue = _selectedKondisi.toLowerCase().trim();
 
     return Column(

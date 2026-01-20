@@ -727,9 +727,33 @@ class _HistoryPeminjamanScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Row
                 Row(
                   children: [
+                    // Equipment Photo Thumbnail
+                    if (peminjaman.alat?.fotoAlat != null && peminjaman.alat!.fotoAlat!.isNotEmpty)
+                      Container(
+                        width: 40,
+                        height: 40,
+                        margin: const EdgeInsets.only(right: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.network(
+                            peminjaman.alat!.fotoAlat!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Icon(
+                              Icons.menu_book_rounded,
+                              size: 20,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        ),
+                      ),
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(

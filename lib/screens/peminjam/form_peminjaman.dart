@@ -537,11 +537,26 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
               color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(6),
             ),
-            child: Icon(
-              Icons.menu_book_rounded,
-              size: 28,
-              color: Colors.grey.shade500,
-            ),
+            child: selectedBook.fotoAlat != null && selectedBook.fotoAlat!.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: Image.network(
+                      selectedBook.fotoAlat!,
+                      width: 50,
+                      height: 70,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.menu_book_rounded,
+                        size: 28,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  )
+                : Icon(
+                    Icons.menu_book_rounded,
+                    size: 28,
+                    color: Colors.grey.shade500,
+                  ),
           ),
           const SizedBox(width: 14),
           Expanded(

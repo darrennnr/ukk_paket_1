@@ -1,4 +1,6 @@
 // lib/services/alat_services.dart
+import 'package:paket_3_training/services/storage_services.dart';
+
 import '../models/alat_model.dart';
 import '../main.dart';
 import 'auth_services.dart';
@@ -8,6 +10,7 @@ class AlatService {
   final String _table = 'alat';
   final LogService _logService = LogService();
   final AuthService _authService = AuthService();
+  final StorageService _storageService = StorageService();
 
   // GetAllAlat dengan search dan filter kategori
   Future<List<AlatModel>> getAllAlat({String? search, int? kategoriId}) async {
@@ -72,7 +75,16 @@ class AlatService {
   }
 
   // Update Alat
-  Future<void> updateAlat(AlatModel alat) async {
+  // Update Alat
+  Future<void> updateAlat(AlatModel alat, {String? oldFotoUrl}) async {
+    // Delete old image if it exists and is from Supabase Storage
+    if (oldFotoUrl != null &&
+        oldFotoUrl.isNotEmpty &&
+        _storageService.isSupabaseUrl(oldFotoUrl) &&
+        oldFotoUrl != alat.fotoAlat) {
+      await _storageService.deleteImage(oldFotoUrl);
+    }
+
     await supabase
         .from(_table)
         .update(alat.toInsertJson())
@@ -90,6 +102,7 @@ class AlatService {
   }
 
   // Delete Alat (dengan validasi peminjaman aktif)
+  // Delete Alat (dengan validasi peminjaman aktif)
   Future<void> deleteAlat(int alatId) async {
     // Cek apakah ada peminjaman aktif
     final activeLoan = await supabase
@@ -103,6 +116,16 @@ class AlatService {
       throw Exception(
         'Tidak dapat menghapus alat yang sedang dipinjam atau menunggu approval',
       );
+    }
+
+    // Get alat data to delete image
+    final alatData = await getAlatById(alatId);
+
+    // Delete image from storage if exists
+    if (alatData?.fotoAlat != null &&
+        alatData!.fotoAlat!.isNotEmpty &&
+        _storageService.isSupabaseUrl(alatData.fotoAlat!)) {
+      await _storageService.deleteImage(alatData.fotoAlat!);
     }
 
     await supabase.from(_table).delete().eq('alat_id', alatId);

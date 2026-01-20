@@ -161,11 +161,12 @@ class AlatNotifier extends Notifier<AlatState> {
   }
 
   // Update alat
-  Future<bool> updateAlat(AlatModel alat) async {
+  // Update alat
+  Future<bool> updateAlat(AlatModel alat, {String? oldFotoUrl}) async {
     try {
       state = state.setLoading(true).clearError();
 
-      await _alatService.updateAlat(alat);
+      await _alatService.updateAlat(alat, oldFotoUrl: oldFotoUrl);
       await loadAlats(
         search: state.searchQuery.isEmpty ? null : state.searchQuery,
         kategoriId: state.selectedKategoriId,

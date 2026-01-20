@@ -764,14 +764,44 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                 // Alat
                 Expanded(
                   flex: 2,
-                  child: Text(
-                    peminjaman.alat?.namaAlat ?? '-',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF1A1A1A),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    children: [
+                      if (peminjaman.alat?.fotoAlat != null && peminjaman.alat!.fotoAlat!.isNotEmpty)
+                        Container(
+                          width: 32,
+                          height: 32,
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: Image.network(
+                              peminjaman.alat!.fotoAlat!,
+                              width: 32,
+                              height: 32,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.inventory_2_outlined,
+                                size: 16,
+                                color: Colors.grey.shade400,
+                              ),
+                            ),
+                          ),
+                        ),
+                      Expanded(
+                        child: Text(
+                          peminjaman.alat?.namaAlat ?? '-',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF1A1A1A),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // Tanggal
@@ -1713,8 +1743,10 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
     int? selectedPeminjamId;
     int? selectedAlatId;
     int jumlahPinjam = 1;
+    int selectedStatusId = 1; // Default: Pending
     DateTime tanggalBerakhir = DateTime.now().add(const Duration(days: 7));
     final keperluanController = TextEditingController();
+    final catatanPetugasController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -1917,6 +1949,70 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               ),
                               style: const TextStyle(fontSize: 13),
                             ),
+                            const SizedBox(height: 16),
+
+                            // Status Peminjaman
+                            _buildFormLabel('Status Peminjaman'),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<int>(
+                              value: selectedStatusId,
+                              decoration: _inputDecoration('Pilih status'),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 1,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.hourglass_empty_rounded, size: 16, color: Color(0xFFFF9800)),
+                                      SizedBox(width: 8),
+                                      Text('Pending', style: TextStyle(fontSize: 13)),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 2,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF4CAF50)),
+                                      SizedBox(width: 8),
+                                      Text('Diterima / Dipinjam', style: TextStyle(fontSize: 13)),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 3,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.cancel_rounded, size: 16, color: Color(0xFFFF5252)),
+                                      SizedBox(width: 8),
+                                      Text('Ditolak', style: TextStyle(fontSize: 13)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              onChanged: (v) =>
+                                  setDialogState(() => selectedStatusId = v ?? 1),
+                            ),
+
+                            // Catatan Petugas (muncul jika status ditolak)
+                            if (selectedStatusId == 3) ...[
+                              const SizedBox(height: 16),
+                              _buildFormLabel('Alasan Penolakan'),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: catatanPetugasController,
+                                maxLines: 3,
+                                decoration: _inputDecoration(
+                                  'Masukkan alasan penolakan',
+                                ),
+                                style: const TextStyle(fontSize: 13),
+                                validator: (v) {
+                                  if (selectedStatusId == 3 && (v == null || v.trim().isEmpty)) {
+                                    return 'Alasan penolakan wajib diisi';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -1963,18 +2059,24 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
 
                                 Navigator.pop(context);
 
+                                final petugasId = ref.read(authProvider).user?.userId;
                                 final peminjaman = PeminjamanModel(
                                   peminjamanId: 0,
                                   peminjamId: selectedPeminjamId,
                                   alatId: selectedAlatId,
+                                  petugasId: selectedStatusId != 1 ? petugasId : null,
                                   kodePeminjaman:
                                       'PMJ-${const Uuid().v4().substring(0, 8).toUpperCase()}',
                                   jumlahPinjam: jumlahPinjam,
                                   tanggalBerakhir: tanggalBerakhir,
+                                  tanggalPinjam: selectedStatusId == 2 ? DateTime.now() : null,
                                   keperluan: keperluanController.text.isEmpty
                                       ? null
                                       : keperluanController.text,
-                                  statusPeminjamanId: 1,
+                                  catatanPetugas: selectedStatusId == 3
+                                      ? catatanPetugasController.text.trim()
+                                      : null,
+                                  statusPeminjamanId: selectedStatusId,
                                 );
 
                                 final success = await ref
@@ -2040,9 +2142,12 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
 
     int? selectedAlatId = peminjaman.alatId;
     int jumlahPinjam = peminjaman.jumlahPinjam;
+    int selectedStatusId = peminjaman.statusPeminjamanId ?? 1;
     DateTime tanggalBerakhir = peminjaman.tanggalBerakhir;
     final keperluanController =
         TextEditingController(text: peminjaman.keperluan ?? '');
+    final catatanPetugasController =
+        TextEditingController(text: peminjaman.catatanPetugas ?? '');
     final formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -2228,6 +2333,70 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               ),
                               style: const TextStyle(fontSize: 13),
                             ),
+                            const SizedBox(height: 16),
+
+                            // Status Peminjaman
+                            _buildFormLabel('Status Peminjaman'),
+                            const SizedBox(height: 8),
+                            DropdownButtonFormField<int>(
+                              value: selectedStatusId,
+                              decoration: _inputDecoration('Pilih status'),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 1,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.hourglass_empty_rounded, size: 16, color: Color(0xFFFF9800)),
+                                      SizedBox(width: 8),
+                                      Text('Pending', style: TextStyle(fontSize: 13)),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 2,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF4CAF50)),
+                                      SizedBox(width: 8),
+                                      Text('Diterima / Dipinjam', style: TextStyle(fontSize: 13)),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: 3,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.cancel_rounded, size: 16, color: Color(0xFFFF5252)),
+                                      SizedBox(width: 8),
+                                      Text('Ditolak', style: TextStyle(fontSize: 13)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              onChanged: (v) =>
+                                  setDialogState(() => selectedStatusId = v ?? 1),
+                            ),
+
+                            // Catatan Petugas (muncul jika status ditolak)
+                            if (selectedStatusId == 3) ...[
+                              const SizedBox(height: 16),
+                              _buildFormLabel('Alasan Penolakan'),
+                              const SizedBox(height: 8),
+                              TextFormField(
+                                controller: catatanPetugasController,
+                                maxLines: 3,
+                                decoration: _inputDecoration(
+                                  'Masukkan alasan penolakan',
+                                ),
+                                style: const TextStyle(fontSize: 13),
+                                validator: (v) {
+                                  if (selectedStatusId == 3 && (v == null || v.trim().isEmpty)) {
+                                    return 'Alasan penolakan wajib diisi';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -2270,13 +2439,24 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
 
                                 Navigator.pop(context);
 
+                                final petugasId = ref.read(authProvider).user?.userId;
+                                final oldStatusId = peminjaman.statusPeminjamanId ?? 1;
+                                
                                 final updated = peminjaman.copyWith(
                                   alatId: selectedAlatId,
                                   jumlahPinjam: jumlahPinjam,
                                   tanggalBerakhir: tanggalBerakhir,
+                                  tanggalPinjam: selectedStatusId == 2 && peminjaman.tanggalPinjam == null
+                                      ? DateTime.now()
+                                      : peminjaman.tanggalPinjam,
                                   keperluan: keperluanController.text.isEmpty
                                       ? null
                                       : keperluanController.text,
+                                  catatanPetugas: selectedStatusId == 3
+                                      ? catatanPetugasController.text.trim()
+                                      : null,
+                                  statusPeminjamanId: selectedStatusId,
+                                  petugasId: selectedStatusId != 1 ? petugasId : peminjaman.petugasId,
                                 );
 
                                 final success = await ref

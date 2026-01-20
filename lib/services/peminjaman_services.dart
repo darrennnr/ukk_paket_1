@@ -17,17 +17,23 @@ class PeminjamanService {
 
   // Ajukan Peminjaman
   Future<void> ajukanPeminjaman(PeminjamanModel peminjaman) async {
-    // 1. Cek duplikasi peminjaman aktif
-    final hasActive = await _hasActiveLoan(
-      peminjaman.peminjamId!,
-      peminjaman.alatId!,
-    );
+    // Jika status langsung dipinjam (2), cek stok dan kurangi
+    final isDirectApprove = peminjaman.statusPeminjamanId == STATUS_DIPINJAM;
+    final isRejected = peminjaman.statusPeminjamanId == STATUS_DITOLAK;
 
-    if (hasActive) {
-      throw Exception('Anda masih memiliki peminjaman aktif untuk alat ini');
+    // 1. Cek duplikasi peminjaman aktif (hanya untuk pending dan dipinjam)
+    if (!isRejected) {
+      final hasActive = await _hasActiveLoan(
+        peminjaman.peminjamId!,
+        peminjaman.alatId!,
+      );
+
+      if (hasActive) {
+        throw Exception('Anda masih memiliki peminjaman aktif untuk alat ini');
+      }
     }
 
-    // 2. Cek Ketersediaan Stok
+    // 2. Cek Ketersediaan Stok (jika langsung approve)
     final alatData = await supabase
         .from('alat')
         .select()
@@ -35,15 +41,15 @@ class PeminjamanService {
         .single();
     final alat = AlatModel.fromJson(alatData);
 
-    if (alat.jumlahTersedia < peminjaman.jumlahPinjam) {
+    if (isDirectApprove && alat.jumlahTersedia < peminjaman.jumlahPinjam) {
       throw Exception('Stok alat tidak mencukupi');
     }
 
-    // 3. Insert Peminjaman (Status Pending)
+    // 3. Insert Peminjaman
     final insertData = peminjaman
         .copyWith(
-          statusPeminjamanId: STATUS_PENDING,
-          tanggalPengajuan: DateTime.now(), // Set waktu pengajuan
+          tanggalPengajuan: DateTime.now(),
+          tanggalPinjam: isDirectApprove ? DateTime.now() : peminjaman.tanggalPinjam,
         )
         .toInsertJson();
 
@@ -54,10 +60,24 @@ class PeminjamanService {
         .single();
     final newPeminjaman = PeminjamanModel.fromJson(response);
 
+    // 4. Kurangi stok jika langsung disetujui
+    if (isDirectApprove) {
+      await supabase
+          .from('alat')
+          .update({
+            'jumlah_tersedia': alat.jumlahTersedia - peminjaman.jumlahPinjam,
+          })
+          .eq('alat_id', alat.alatId);
+    }
+
     // Log
     await _logService.logActivity(
       userId: peminjaman.peminjamId!,
-      aktivitas: 'Ajukan Peminjaman',
+      aktivitas: isDirectApprove
+          ? 'Tambah Peminjaman (Langsung Disetujui)'
+          : isRejected
+              ? 'Tambah Peminjaman (Langsung Ditolak)'
+              : 'Ajukan Peminjaman',
       tabelTerkait: _table,
       idTerkait: newPeminjaman.peminjamanId,
       deskripsi: 'Kode: ${newPeminjaman.kodePeminjaman}',
@@ -214,26 +234,86 @@ class PeminjamanService {
     return (response as List).map((e) => PeminjamanModel.fromJson(e)).toList();
   }
 
-  // Update Peminjaman (untuk edit data peminjaman yang masih pending)
+  // Update Peminjaman (untuk edit data peminjaman - admin dapat mengubah status langsung)
   Future<void> updatePeminjaman(PeminjamanModel peminjaman) async {
-    // Hanya bisa update jika masih pending
+    // Ambil data peminjaman saat ini
     final currentData = await supabase
         .from(_table)
         .select()
         .eq('peminjaman_id', peminjaman.peminjamanId)
         .single();
+    
+    final oldStatusId = currentData['status_peminjaman_id'] as int;
+    final newStatusId = peminjaman.statusPeminjamanId ?? oldStatusId;
+    final oldAlatId = currentData['alat_id'] as int;
+    final oldJumlah = currentData['jumlah_pinjam'] as int;
 
-    if (currentData['status_peminjaman_id'] != STATUS_PENDING) {
-      throw Exception('Tidak dapat mengubah peminjaman yang sudah diproses');
+    // Logika perubahan stok:
+    // - Jika dari status 2 (dipinjam) ke lainnya: kembalikan stok
+    // - Jika dari status lain ke 2 (dipinjam): kurangi stok
+    // - Jika tetap di status 2 tapi ganti alat/jumlah: kembalikan lama, kurangi baru
+
+    // Kembalikan stok lama jika sebelumnya dipinjam
+    if (oldStatusId == STATUS_DIPINJAM) {
+      final oldAlatData = await supabase
+          .from('alat')
+          .select()
+          .eq('alat_id', oldAlatId)
+          .single();
+      final oldAlat = AlatModel.fromJson(oldAlatData);
+
+      await supabase
+          .from('alat')
+          .update({
+            'jumlah_tersedia': oldAlat.jumlahTersedia + oldJumlah,
+          })
+          .eq('alat_id', oldAlatId);
     }
 
+    // Kurangi stok baru jika status baru adalah dipinjam
+    if (newStatusId == STATUS_DIPINJAM) {
+      final newAlatData = await supabase
+          .from('alat')
+          .select()
+          .eq('alat_id', peminjaman.alatId!)
+          .single();
+      final newAlat = AlatModel.fromJson(newAlatData);
+
+      if (newAlat.jumlahTersedia < peminjaman.jumlahPinjam) {
+        // Jika stok tidak cukup, kembalikan stok yang sudah dikembalikan
+        if (oldStatusId == STATUS_DIPINJAM) {
+          final oldAlatData = await supabase
+              .from('alat')
+              .select()
+              .eq('alat_id', oldAlatId)
+              .single();
+          final oldAlat = AlatModel.fromJson(oldAlatData);
+          await supabase
+              .from('alat')
+              .update({
+                'jumlah_tersedia': oldAlat.jumlahTersedia - oldJumlah,
+              })
+              .eq('alat_id', oldAlatId);
+        }
+        throw Exception('Stok alat tidak mencukupi');
+      }
+
+      await supabase
+          .from('alat')
+          .update({
+            'jumlah_tersedia': newAlat.jumlahTersedia - peminjaman.jumlahPinjam,
+          })
+          .eq('alat_id', peminjaman.alatId!);
+    }
+
+    // Update data peminjaman
     await supabase
         .from(_table)
         .update(peminjaman.toInsertJson())
         .eq('peminjaman_id', peminjaman.peminjamanId);
 
     await _logService.logActivity(
-      userId: peminjaman.peminjamId!,
+      userId: peminjaman.petugasId ?? peminjaman.peminjamId!,
       aktivitas: 'Update Peminjaman',
       tabelTerkait: _table,
       idTerkait: peminjaman.peminjamanId,

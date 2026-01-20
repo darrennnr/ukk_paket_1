@@ -586,13 +586,33 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                         topRight: Radius.circular(12),
                       ),
                     ),
-                    child: Center(
-                      child: Icon(
-                        Icons.menu_book_rounded,
-                        size: 56,
-                        color: Colors.grey.shade400,
-                      ),
-                    ),
+                    child: book.fotoAlat != null && book.fotoAlat!.isNotEmpty
+                        ? ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                            child: Image.network(
+                              book.fotoAlat!,
+                              width: double.infinity,
+                              height: 140,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Center(
+                                child: Icon(
+                                  Icons.menu_book_rounded,
+                                  size: 56,
+                                  color: Colors.grey.shade400,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Center(
+                            child: Icon(
+                              Icons.menu_book_rounded,
+                              size: 56,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
                   ),
                   // Availability Badge
                   Positioned(

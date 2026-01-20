@@ -720,14 +720,44 @@ class _PetugasPeminjamanManagementState
             // Alat
             Expanded(
               flex: 2,
-              child: Text(
-                peminjaman.alat?.namaAlat ?? '-',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF1A1A1A),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+              child: Row(
+                children: [
+                  if (peminjaman.alat?.fotoAlat != null && peminjaman.alat!.fotoAlat!.isNotEmpty)
+                    Container(
+                      width: 32,
+                      height: 32,
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.network(
+                          peminjaman.alat!.fotoAlat!,
+                          width: 32,
+                          height: 32,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.inventory_2_outlined,
+                            size: 16,
+                            color: Colors.grey.shade400,
+                          ),
+                        ),
+                      ),
+                    ),
+                  Expanded(
+                    child: Text(
+                      peminjaman.alat?.namaAlat ?? '-',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF1A1A1A),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
             ),
             // Tanggal

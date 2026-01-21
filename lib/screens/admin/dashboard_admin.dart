@@ -1,4 +1,4 @@
-// lib/screens/admin/dashboard_admin.dart
+﻿// lib/screens/admin/dashboard_admin.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart' hide AppTheme;
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import '../../providers/dashboard_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -65,9 +66,9 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
             Container(
               width: 260,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 border: Border(
-                  right: BorderSide(color: Colors.grey.shade200, width: 1),
+                  right: BorderSide(color: AppColors.borderMedium, width: 1),
                 ),
               ),
               child: AdminSidebar(currentRoute: '/admin/dashboard'),
@@ -123,9 +124,9 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
             children: [
               Text(
                 greeting,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
-                  color: Colors.grey.shade600,
+                  color: AppColors.textSecondary,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.3,
                 ),
@@ -136,7 +137,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1A1A1A),
+                  color: AppColors.textPrimary,
                   letterSpacing: -0.3,
                 ),
               ),
@@ -153,22 +154,22 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
   PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: AppColors.surface,
       leading: _isDesktop
           ? null
           : IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.menu_rounded,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
                 size: 22,
               ),
               onPressed: () => _scaffoldKey.currentState?.openDrawer(),
             ),
-      title: Text(
+      title: const Text(
         'Dashboard',
         style: TextStyle(
-          color: const Color(0xFF1A1A1A),
+          color: AppColors.textPrimary,
           fontSize: 16,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.2,
@@ -186,7 +187,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: Colors.grey.shade200),
+        child: Container(height: 1, color: AppColors.borderMedium),
       ),
     );
   }
@@ -196,7 +197,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
       clipBehavior: Clip.none,
       children: [
         IconButton(
-          icon: Icon(icon, color: Colors.grey.shade700, size: 20),
+          icon: Icon(icon, color: AppColors.textPrimary, size: 20),
           onPressed: onTap,
           padding: const EdgeInsets.all(8),
           constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
@@ -207,15 +208,15 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
             top: 6,
             child: Container(
               padding: const EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF5252),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFF5252),
                 shape: BoxShape.circle,
               ),
               constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
               child: Text(
                 badge,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textInverse,
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
                 ),
@@ -231,12 +232,13 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.borderMedium),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -252,7 +254,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                 child: Text(
                   userName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textInverse,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -266,15 +268,15 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                 style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: Color(0xFF1A1A1A),
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
             const SizedBox(width: 4),
-            Icon(
+            const Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: Colors.grey.shade600,
+              color: AppColors.textSecondary,
             ),
           ],
         ),
@@ -288,10 +290,10 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           height: 40,
           child: Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.person_outline_rounded,
                 size: 18,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
               ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
@@ -299,18 +301,18 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           ),
         ),
         const PopupMenuDivider(height: 1),
-        PopupMenuItem(
+        const PopupMenuItem(
           value: 'logout',
           height: 40,
           child: Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.logout_rounded,
                 size: 18,
                 color: Color(0xFFFF5252),
               ),
-              const SizedBox(width: 10),
-              const Text(
+              SizedBox(width: 10),
+              Text(
                 'Keluar',
                 style: TextStyle(fontSize: 13, color: Color(0xFFFF5252)),
               ),
@@ -392,9 +394,9 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
     return Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -417,17 +419,17 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1A1A1A),
+                      color: AppColors.textPrimary,
                       letterSpacing: -0.5,
                     ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     stat.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                       letterSpacing: 0.2,
                     ),
                   ),
@@ -478,9 +480,9 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -526,7 +528,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                       return BarTooltipItem(
                         '${rod.toY.toInt()}',
                         const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                         ),
@@ -546,7 +548,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                             value.toInt() == 0 ? 'Pending' : 'Aktif',
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.grey.shade600,
+                              color: AppColors.textSecondary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -611,16 +613,16 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
       return Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey.shade200, width: 1),
+          border: Border.all(color: AppColors.borderMedium, width: 1),
         ),
         child: const Center(
           child: Padding(
             padding: EdgeInsets.all(40),
             child: Text(
               'Tidak ada data',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(fontSize: 12, color: AppColors.textDisabled),
             ),
           ),
         ),
@@ -630,9 +632,9 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -679,7 +681,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                     titleStyle: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Colors.white,
+                      color: AppColors.surface,
                     ),
                   ),
                   if (dipinjam > 0)
@@ -691,7 +693,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                       titleStyle: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.surface,
                       ),
                     ),
                 ],
@@ -729,7 +731,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: Colors.grey.shade700,
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -815,9 +817,9 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
             const SizedBox(height: 12),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade200, width: 1),
+                border: Border.all(color: AppColors.borderMedium, width: 1),
               ),
               child: ListView.separated(
                 shrinkWrap: true,
@@ -826,7 +828,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                 separatorBuilder: (context, index) => Divider(
                   height: 1,
                   thickness: 1,
-                  color: Colors.grey.shade100,
+                  color: AppColors.surfaceContainerLow,
                   indent: 50,
                   endIndent: 12,
                 ),
@@ -946,14 +948,14 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
                         Icon(
                           Icons.access_time_rounded,
                           size: 11,
-                          color: Colors.grey.shade500,
+                          color: AppColors.textTertiary,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           timeAgo,
                           style: TextStyle(
                             fontSize: 11,
-                            color: Colors.grey.shade600,
+                            color: AppColors.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -1023,7 +1025,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
     return Container(
           height: height,
           decoration: BoxDecoration(
-            color: Colors.grey.shade200,
+            color: AppColors.borderMedium,
             borderRadius: BorderRadius.circular(10),
           ),
         )
@@ -1038,7 +1040,8 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
+shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Row(
           children: [
             Icon(Icons.logout_rounded, color: Color(0xFFFF5252), size: 20),
@@ -1058,7 +1061,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
             onPressed: () => Navigator.pop(context),
             child: Text(
               'Batal',
-              style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
             ),
           ),
           ElevatedButton(

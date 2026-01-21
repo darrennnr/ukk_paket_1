@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart' hide AppTheme;
 import '../providers/auth_provider.dart';
 
 class PetugasSidebar extends ConsumerWidget {
@@ -20,11 +21,11 @@ class PetugasSidebar extends ConsumerWidget {
         Widget sidebarContent = Container(
           width: isDrawerMode ? null : 260,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: isDrawerMode
                 ? null
                 : Border(
-                    right: BorderSide(color: Colors.grey.shade200, width: 1),
+                    right: BorderSide(color: AppColors.borderMedium, width: 1),
                   ),
           ),
           child: Column(
@@ -34,7 +35,7 @@ class PetugasSidebar extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+                    bottom: BorderSide(color: AppColors.borderMedium, width: 1),
                   ),
                 ),
                 child: Row(
@@ -50,7 +51,7 @@ class PetugasSidebar extends ConsumerWidget {
                         child: Text(
                           (user?.namaLengkap ?? 'P')[0].toUpperCase(),
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textInverse,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -68,7 +69,7 @@ class PetugasSidebar extends ConsumerWidget {
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF1A1A1A),
+                              color: AppColors.textPrimary,
                               letterSpacing: -0.1,
                             ),
                             maxLines: 1,
@@ -77,9 +78,9 @@ class PetugasSidebar extends ConsumerWidget {
                           const SizedBox(height: 2),
                           Text(
                             'Petugas',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 11,
-                              color: Colors.grey.shade600,
+                              color: AppColors.textSecondary,
                               letterSpacing: 0,
                             ),
                           ),
@@ -164,10 +165,10 @@ class PetugasSidebar extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Text(
         title.toUpperCase(),
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
-          color: Colors.grey.shade500,
+          color: AppColors.textTertiary,
           letterSpacing: 0.8,
         ),
       ),
@@ -221,7 +222,7 @@ class PetugasSidebar extends ConsumerWidget {
                 Icon(
                   icon,
                   size: 18,
-                  color: isActive ? AppTheme.primaryColor : Colors.grey.shade600,
+                  color: isActive ? AppTheme.primaryColor : AppColors.textSecondary,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -230,7 +231,7 @@ class PetugasSidebar extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                      color: isActive ? AppTheme.primaryColor : const Color(0xFF1A1A1A),
+                      color: isActive ? AppTheme.primaryColor : AppColors.textPrimary,
                       letterSpacing: -0.1,
                     ),
                   ),
@@ -270,7 +271,7 @@ class PetugasSidebar extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: Row(
               children: [
@@ -331,7 +332,7 @@ class PetugasSidebar extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               'Apakah Anda yakin ingin keluar dari sistem?',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade700, height: 1.4),
+              style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, height: 1.4),
             ),
             const SizedBox(height: 20),
             Row(
@@ -342,12 +343,12 @@ class PetugasSidebar extends ConsumerWidget {
                   style: TextButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Batal',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -369,7 +370,7 @@ class PetugasSidebar extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.textInverse,
                     ),
                   ),
                 ),

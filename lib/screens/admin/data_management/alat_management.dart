@@ -1,4 +1,4 @@
-// lib/screens/admin/data_management/alat_management.dart
+﻿// lib/screens/admin/data_management/alat_management.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +8,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/services/storage_services.dart';
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/alat_provider.dart';
@@ -63,9 +65,9 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
             Container(
               width: 260,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 border: Border(
-                  right: BorderSide(color: Colors.grey.shade200, width: 1),
+                  right: BorderSide(color: AppColors.borderMedium, width: 1),
                 ),
               ),
               child: AdminSidebar(currentRoute: '/admin/alat'),
@@ -110,14 +112,14 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
 
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: AppColors.surface,
       leading: _isDesktop
           ? null
           : IconButton(
               icon: Icon(
                 Icons.menu_rounded,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
                 size: 22,
               ),
               onPressed: () => _scaffoldKey.currentState?.openDrawer(),
@@ -139,7 +141,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: Colors.grey.shade200),
+        child: Container(height: 1, color: AppColors.borderMedium),
       ),
     );
   }
@@ -148,12 +150,13 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.borderMedium),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -169,7 +172,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                 child: Text(
                   userName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -191,7 +194,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
             Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: Colors.grey.shade600,
+              color: AppColors.textSecondary,
             ),
           ],
         ),
@@ -208,7 +211,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
               Icon(
                 Icons.person_outline_rounded,
                 size: 18,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
               ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
@@ -274,7 +277,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                 '$alatCount total alat • $tersediaCount tersedia',
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey.shade600,
+                  color: AppColors.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -297,27 +300,27 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
           child: Container(
             height: 42,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: TextField(
               controller: _searchController,
               style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
               decoration: InputDecoration(
                 hintText: 'Cari alat...',
-                hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+                hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
                 prefixIcon: Icon(
                   Icons.search_rounded,
                   size: 18,
-                  color: Colors.grey.shade500,
+                  color: AppColors.textTertiary,
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: Icon(
                           Icons.close_rounded,
                           size: 16,
-                          color: Colors.grey.shade500,
+                          color: AppColors.textTertiary,
                         ),
                         onPressed: () {
                           _searchController.clear();
@@ -343,21 +346,21 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
           height: 42,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<int?>(
               value: _selectedKategoriFilter,
               hint: Text(
                 'Kategori',
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
               icon: Icon(
                 Icons.arrow_drop_down_rounded,
                 size: 20,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondary,
               ),
               style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
               items: [
@@ -365,7 +368,10 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                   value: null,
                   child: Text(
                     'Semua Kategori',
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ),
                 ...kategoris.map(
@@ -422,9 +428,9 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
           borderRadius: BorderRadius.circular(10),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -433,7 +439,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                 Container(
                   height: 120,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: AppColors.surfaceContainerLow,
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(10),
                     ),
@@ -485,7 +491,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                                 child: Icon(
                                   Icons.inventory_2_outlined,
                                   size: 40,
-                                  color: Colors.grey.shade400,
+                                  color: AppColors.textHint,
                                 ),
                               );
                             },
@@ -497,7 +503,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                           child: Icon(
                             Icons.inventory_2_outlined,
                             size: 40,
-                            color: Colors.grey.shade400,
+                            color: AppColors.textHint,
                           ),
                         ),
                       // Status Badge
@@ -526,7 +532,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                             isAvailable ? 'Tersedia' : 'Habis',
                             style: const TextStyle(
                               fontSize: 10,
-                              color: Colors.white,
+                              color: AppColors.surface,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -558,7 +564,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                           kategoriName,
                           style: TextStyle(
                             fontSize: 11,
-                            color: Colors.grey.shade600,
+                            color: AppColors.textSecondary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -569,7 +575,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                             Icon(
                               Icons.qr_code_2_rounded,
                               size: 12,
-                              color: Colors.grey.shade500,
+                              color: AppColors.textTertiary,
                             ),
                             const SizedBox(width: 4),
                             Expanded(
@@ -577,7 +583,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                                 alat.kodeAlat,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Colors.grey.shade700,
+                                  color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w500,
                                 ),
                                 maxLines: 1,
@@ -605,7 +611,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                               icon: Icon(
                                 Icons.more_vert_rounded,
                                 size: 16,
-                                color: Colors.grey.shade600,
+                                color: AppColors.textSecondary,
                               ),
                               offset: const Offset(0, 30),
                               shape: RoundedRectangleBorder(
@@ -619,7 +625,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                                       Icon(
                                         Icons.visibility_outlined,
                                         size: 16,
-                                        color: Colors.grey.shade700,
+                                        color: AppColors.textPrimary,
                                       ),
                                       const SizedBox(width: 8),
                                       const Text(
@@ -640,7 +646,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                                       Icon(
                                         Icons.edit_outlined,
                                         size: 16,
-                                        color: Colors.grey.shade700,
+                                        color: AppColors.textPrimary,
                                       ),
                                       const SizedBox(width: 8),
                                       const Text(
@@ -708,13 +714,13 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.surfaceContainerLow,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.inventory_2_outlined,
                 size: 48,
-                color: Colors.grey.shade400,
+                color: AppColors.textHint,
               ),
             ),
             const SizedBox(height: 16),
@@ -729,7 +735,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
             const SizedBox(height: 4),
             Text(
               'Tambahkan alat pertama Anda',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -754,7 +760,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
       itemBuilder: (context, index) =>
           Container(
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  color: AppColors.borderMedium,
                   borderRadius: BorderRadius.circular(10),
                 ),
               )
@@ -771,7 +777,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
       onPressed: () => _showFormDialog(),
       backgroundColor: AppTheme.primaryColor,
       elevation: 2,
-      child: const Icon(Icons.add_rounded, color: Colors.white, size: 24),
+      child: const Icon(Icons.add_rounded, color: AppColors.surface, size: 24),
     );
   }
 
@@ -783,6 +789,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: _isDesktop ? 500 : double.infinity,
@@ -841,12 +848,12 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                         fit: BoxFit.cover,
                         errorBuilder: (_, __, ___) => Container(
                           height: 200,
-                          color: Colors.grey.shade100,
+                          color: AppColors.surfaceContainerLow,
                           child: Center(
                             child: Icon(
                               Icons.inventory_2_outlined,
                               size: 48,
-                              color: Colors.grey.shade400,
+                              color: AppColors.textHint,
                             ),
                           ),
                         ),
@@ -921,7 +928,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -959,6 +966,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         contentPadding: const EdgeInsets.all(20),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -983,7 +991,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
             const SizedBox(height: 8),
             Text(
               'Apakah Anda yakin ingin menghapus "${alat.namaAlat}"?',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -994,7 +1002,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: AppColors.borderDark),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1273,6 +1281,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: AppColors.surface,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 650),
         child: Column(
@@ -1317,7 +1326,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                 ],
               ),
             ),
-            Divider(height: 1, color: Colors.grey.shade200),
+            Divider(height: 1, color: AppColors.borderMedium),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -1379,7 +1388,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                 ),
               ),
             ),
-            Divider(height: 1, color: Colors.grey.shade200),
+            Divider(height: 1, color: AppColors.borderMedium),
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -1391,7 +1400,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                           : () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: AppColors.borderDark),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -1401,6 +1410,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
+                          color: Color(0xFF1A1A1A),
                         ),
                       ),
                     ),
@@ -1423,7 +1433,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                               width: 16,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: AppColors.surface,
                               ),
                             )
                           : const Text(
@@ -1431,6 +1441,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
+                                color: AppColors.surface,
                               ),
                             ),
                     ),
@@ -1464,7 +1475,10 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
               children: [
                 Text(
                   _useFileUpload ? 'Upload File' : 'URL',
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(width: 4),
                 Switch(
@@ -1495,9 +1509,9 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: AppColors.surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: AppColors.borderMedium),
               ),
               child: Column(
                 children: [
@@ -1516,7 +1530,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                       _selectedImageName ?? '',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.grey.shade700,
+                        color: AppColors.textPrimary,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -1535,24 +1549,21 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                     Icon(
                       Icons.cloud_upload_outlined,
                       size: 40,
-                      color: Colors.grey.shade400,
+                      color: AppColors.textHint,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       'Klik untuk upload foto',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey.shade600,
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'PNG, JPG (max. 5MB)',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.grey.shade400,
-                      ),
+                      style: TextStyle(fontSize: 11, color: AppColors.textHint),
                     ),
                   ],
                 ],
@@ -1566,20 +1577,20 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
             style: const TextStyle(fontSize: 13),
             decoration: InputDecoration(
               hintText: 'https://... (opsional)',
-              hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+              hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
               filled: true,
-              fillColor: Colors.grey.shade50,
+              fillColor: AppColors.surfaceContainerLowest,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 10,
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+                borderSide: BorderSide(color: AppColors.borderMedium),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+                borderSide: BorderSide(color: AppColors.borderMedium),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -1602,12 +1613,12 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   height: 120,
-                  color: Colors.grey.shade100,
+                  color: AppColors.surfaceContainerLow,
                   child: Center(
                     child: Icon(
                       Icons.broken_image_outlined,
                       size: 40,
-                      color: Colors.grey.shade400,
+                      color: AppColors.textHint,
                     ),
                   ),
                 ),
@@ -1647,20 +1658,20 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
           style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+            hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: AppColors.surfaceContainerLowest,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -1697,18 +1708,18 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
           value: _selectedKategoriId,
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: AppColors.surfaceContainerLowest,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
           ),
           items: [
@@ -1751,18 +1762,18 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
           value: normalizedValue,
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: AppColors.surfaceContainerLowest,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
           ),
           items: const [

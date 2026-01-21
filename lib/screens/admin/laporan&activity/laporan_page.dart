@@ -1,4 +1,4 @@
-// lib/screens/admin/laporan&activity/laporan_page.dart
+﻿// lib/screens/admin/laporan&activity/laporan_page.dart
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -11,6 +11,8 @@ import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
 import 'package:paket_3_training/services/laporan_services.dart';
@@ -92,9 +94,9 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
             Container(
               width: 260,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 border: Border(
-                  right: BorderSide(color: Colors.grey.shade200, width: 1),
+                  right: BorderSide(color: AppColors.borderMedium, width: 1),
                 ),
               ),
               child: AdminSidebar(currentRoute: '/admin/laporan'),
@@ -125,17 +127,17 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
   PreferredSizeWidget _buildAppBar() {
     final user = ref.watch(authProvider).user;
     final userName = user?.namaLengkap ?? 'Admin';
-    
+
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: AppColors.surface,
       leading: _isDesktop
           ? null
           : IconButton(
               icon: Icon(
                 Icons.menu_rounded,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
                 size: 22,
               ),
               onPressed: () => _scaffoldKey.currentState?.openDrawer(),
@@ -157,7 +159,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: Colors.grey.shade200),
+        child: Container(height: 1, color: AppColors.borderMedium),
       ),
     );
   }
@@ -166,12 +168,13 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.borderMedium),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -187,7 +190,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                 child: Text(
                   userName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -209,7 +212,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
             Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: Colors.grey.shade600,
+              color: AppColors.textSecondary,
             ),
           ],
         ),
@@ -223,7 +226,11 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: AppColors.textPrimary,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -235,7 +242,11 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -274,7 +285,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
           'Generate laporan berdasarkan periode dan filter tertentu',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey.shade600,
+            color: AppColors.textSecondary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -294,9 +305,9 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
     return Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,7 +360,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
               ),
 
               const SizedBox(height: 20),
-              Divider(height: 1, color: Colors.grey.shade200),
+              Divider(height: 1, color: AppColors.borderMedium),
               const SizedBox(height: 20),
 
               // Date Range
@@ -383,7 +394,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                 ),
 
               const SizedBox(height: 20),
-              Divider(height: 1, color: Colors.grey.shade200),
+              Divider(height: 1, color: AppColors.borderMedium),
               const SizedBox(height: 20),
 
               // Actions
@@ -399,7 +410,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                       ),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: AppColors.borderDark),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -422,7 +433,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.surface,
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
@@ -455,10 +466,12 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor : Colors.grey.shade50,
+          color: isSelected
+              ? AppTheme.primaryColor
+              : AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isSelected ? AppTheme.primaryColor : Colors.grey.shade200,
+            color: isSelected ? AppTheme.primaryColor : AppColors.borderMedium,
             width: 1.5,
           ),
         ),
@@ -468,7 +481,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
             Icon(
               icon,
               size: 16,
-              color: isSelected ? Colors.white : Colors.grey.shade600,
+              color: isSelected ? AppColors.surface : AppColors.textSecondary,
             ),
             const SizedBox(width: 8),
             Text(
@@ -476,7 +489,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : Colors.grey.shade700,
+                color: isSelected ? AppColors.surface : AppColors.textPrimary,
               ),
             ),
           ],
@@ -514,16 +527,16 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200, width: 1),
+          border: Border.all(color: AppColors.borderMedium, width: 1),
         ),
         child: Row(
           children: [
             Icon(
               Icons.calendar_today_outlined,
               size: 16,
-              color: Colors.grey.shade600,
+              color: AppColors.textSecondary,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -534,7 +547,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                     label,
                     style: TextStyle(
                       fontSize: 10,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -560,9 +573,9 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<int?>(
@@ -570,12 +583,12 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
           isExpanded: true,
           hint: Text(
             'Status',
-            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+            style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
           ),
           icon: Icon(
             Icons.arrow_drop_down_rounded,
             size: 20,
-            color: Colors.grey.shade600,
+            color: AppColors.textSecondary,
           ),
           style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
           items: const [
@@ -628,9 +641,9 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
     return Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -682,7 +695,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                 ],
               ),
               const SizedBox(height: 20),
-              Divider(height: 1, color: Colors.grey.shade200),
+              Divider(height: 1, color: AppColors.borderMedium),
               const SizedBox(height: 20),
 
               if (laporanType == 'peminjaman')
@@ -709,10 +722,10 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isPrimary ? AppTheme.primaryColor : Colors.white,
+          color: isPrimary ? AppTheme.primaryColor : AppColors.surface,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: isPrimary ? AppTheme.primaryColor : Colors.grey.shade300,
+            color: isPrimary ? AppTheme.primaryColor : AppColors.borderDark,
             width: 1,
           ),
         ),
@@ -722,7 +735,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
             Icon(
               icon,
               size: 16,
-              color: isPrimary ? Colors.white : Colors.grey.shade700,
+              color: isPrimary ? AppColors.surface : AppColors.textPrimary,
             ),
             if (!_isDesktop && _isTablet) ...[
               const SizedBox(width: 6),
@@ -731,7 +744,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isPrimary ? Colors.white : Colors.grey.shade700,
+                  color: isPrimary ? AppColors.surface : AppColors.textPrimary,
                 ),
               ),
             ] else if (_isDesktop) ...[
@@ -741,7 +754,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: isPrimary ? Colors.white : Colors.grey.shade700,
+                  color: isPrimary ? AppColors.surface : AppColors.textPrimary,
                 ),
               ),
             ],
@@ -853,7 +866,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                   label,
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.grey.shade600,
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -879,14 +892,14 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
       return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200, width: 1),
+          border: Border.all(color: AppColors.borderMedium, width: 1),
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: AppColors.surfaceContainerLowest,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(8),
                 ),
@@ -946,13 +959,13 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                 ],
               ),
             ),
-            Divider(height: 1, color: Colors.grey.shade200),
+            Divider(height: 1, color: AppColors.borderMedium),
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: data.length,
               separatorBuilder: (_, __) =>
-                  Divider(height: 1, color: Colors.grey.shade100),
+                  Divider(height: 1, color: AppColors.surfaceContainerLow),
               itemBuilder: (context, index) {
                 final item = data[index];
                 return Container(
@@ -1025,9 +1038,9 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
         return Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: AppColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1050,14 +1063,14 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
               const SizedBox(height: 8),
               Text(
                 '${item.peminjam?.namaLengkap ?? '-'} - ${item.alat?.namaAlat ?? '-'}',
-                style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                style: TextStyle(fontSize: 11, color: AppColors.textPrimary),
               ),
               const SizedBox(height: 4),
               Text(
                 item.tanggalPinjam != null
                     ? DateFormat('dd MMM yyyy').format(item.tanggalPinjam!)
                     : '-',
-                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
               ),
             ],
           ),
@@ -1164,7 +1177,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
         //               'Total Denda',
         //               style: TextStyle(
         //                 fontSize: 11,
-        //                 color: Colors.grey.shade600,
+        //                 color: AppColors.textSecondary,
         //                 fontWeight: FontWeight.w500,
         //               ),
         //             ),
@@ -1200,14 +1213,14 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
       return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200, width: 1),
+          border: Border.all(color: AppColors.borderMedium, width: 1),
         ),
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: AppColors.surfaceContainerLowest,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(8),
                 ),
@@ -1267,13 +1280,13 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                 ],
               ),
             ),
-            Divider(height: 1, color: Colors.grey.shade200),
+            Divider(height: 1, color: AppColors.borderMedium),
             ListView.separated(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: data.length,
               separatorBuilder: (_, __) =>
-                  Divider(height: 1, color: Colors.grey.shade100),
+                  Divider(height: 1, color: AppColors.surfaceContainerLow),
               itemBuilder: (context, index) {
                 final item = data[index];
                 return Container(
@@ -1350,9 +1363,9 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
         return Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: AppColors.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1367,7 +1380,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
               const SizedBox(height: 8),
               Text(
                 '${item.peminjaman?.peminjam?.namaLengkap ?? '-'} - ${item.kondisiAlat ?? '-'}',
-                style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                style: TextStyle(fontSize: 11, color: AppColors.textPrimary),
               ),
               const SizedBox(height: 4),
               Row(
@@ -1377,7 +1390,10 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
                     item.tanggalKembali != null
                         ? DateFormat('dd MMM yyyy').format(item.tanggalKembali!)
                         : '-',
-                    style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   if ((item.totalPembayaran ?? 0) > 0)
                     Text(
@@ -1416,7 +1432,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
         color = const Color(0xFF4CAF50);
         break;
       default:
-        color = Colors.grey;
+        color = AppColors.textDisabled;
     }
 
     return Container(
@@ -1448,13 +1464,13 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.surfaceContainerLow,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.receipt_long_outlined,
                 size: 48,
-                color: Colors.grey.shade400,
+                color: AppColors.textHint,
               ),
             ),
             const SizedBox(height: 16),
@@ -1470,7 +1486,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
             const SizedBox(height: 4),
             Text(
               'Coba ubah filter atau periode',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -1481,7 +1497,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
   Widget _buildLoadingSkeleton() {
     return Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade200,
+            color: AppColors.borderMedium,
             borderRadius: BorderRadius.circular(8),
           ),
           height: 300,

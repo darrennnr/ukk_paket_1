@@ -17,9 +17,10 @@ class PeminjamanService {
 
   // Ajukan Peminjaman
   Future<void> ajukanPeminjaman(PeminjamanModel peminjaman) async {
-    // Jika status langsung dipinjam (2), cek stok dan kurangi
-    final isDirectApprove = peminjaman.statusPeminjamanId == STATUS_DIPINJAM;
-    final isRejected = peminjaman.statusPeminjamanId == STATUS_DITOLAK;
+    // Default status adalah Pending (1) jika tidak di-set
+    final statusId = peminjaman.statusPeminjamanId ?? STATUS_PENDING;
+    final isDirectApprove = statusId == STATUS_DIPINJAM;
+    final isRejected = statusId == STATUS_DITOLAK;
 
     // 1. Cek duplikasi peminjaman aktif (hanya untuk pending dan dipinjam)
     if (!isRejected) {
@@ -45,11 +46,17 @@ class PeminjamanService {
       throw Exception('Stok alat tidak mencukupi');
     }
 
-    // 3. Insert Peminjaman
+    // 3. Validasi tanggal pengambilan
+    if (peminjaman.tanggalPinjam == null && !isRejected) {
+      throw Exception('Tanggal pengambilan harus diisi');
+    }
+
+    // 4. Insert Peminjaman
     final insertData = peminjaman
         .copyWith(
           tanggalPengajuan: DateTime.now(),
-          tanggalPinjam: isDirectApprove ? DateTime.now() : peminjaman.tanggalPinjam,
+          statusPeminjamanId:
+              statusId, // Gunakan status yang sudah di-set atau default Pending
         )
         .toInsertJson();
 
@@ -60,7 +67,7 @@ class PeminjamanService {
         .single();
     final newPeminjaman = PeminjamanModel.fromJson(response);
 
-    // 4. Kurangi stok jika langsung disetujui
+    // 5. Kurangi stok jika langsung disetujui
     if (isDirectApprove) {
       await supabase
           .from('alat')
@@ -76,8 +83,8 @@ class PeminjamanService {
       aktivitas: isDirectApprove
           ? 'Tambah Peminjaman (Langsung Disetujui)'
           : isRejected
-              ? 'Tambah Peminjaman (Langsung Ditolak)'
-              : 'Ajukan Peminjaman',
+          ? 'Tambah Peminjaman (Langsung Ditolak)'
+          : 'Ajukan Peminjaman',
       tabelTerkait: _table,
       idTerkait: newPeminjaman.peminjamanId,
       deskripsi: 'Kode: ${newPeminjaman.kodePeminjaman}',
@@ -242,7 +249,7 @@ class PeminjamanService {
         .select()
         .eq('peminjaman_id', peminjaman.peminjamanId)
         .single();
-    
+
     final oldStatusId = currentData['status_peminjaman_id'] as int;
     final newStatusId = peminjaman.statusPeminjamanId ?? oldStatusId;
     final oldAlatId = currentData['alat_id'] as int;
@@ -264,9 +271,7 @@ class PeminjamanService {
 
       await supabase
           .from('alat')
-          .update({
-            'jumlah_tersedia': oldAlat.jumlahTersedia + oldJumlah,
-          })
+          .update({'jumlah_tersedia': oldAlat.jumlahTersedia + oldJumlah})
           .eq('alat_id', oldAlatId);
     }
 
@@ -290,9 +295,7 @@ class PeminjamanService {
           final oldAlat = AlatModel.fromJson(oldAlatData);
           await supabase
               .from('alat')
-              .update({
-                'jumlah_tersedia': oldAlat.jumlahTersedia - oldJumlah,
-              })
+              .update({'jumlah_tersedia': oldAlat.jumlahTersedia - oldJumlah})
               .eq('alat_id', oldAlatId);
         }
         throw Exception('Stok alat tidak mencukupi');
@@ -321,24 +324,48 @@ class PeminjamanService {
   }
 
   // Cancel/Delete Peminjaman (hanya jika masih pending)
-  Future<void> cancelPeminjaman(int peminjamanId, int userId) async {
-    final currentData = await supabase
-        .from(_table)
-        .select()
-        .eq('peminjaman_id', peminjamanId)
-        .single();
+// Cancel Peminjaman (ubah status menjadi Dibatalkan - ID 6)
+Future<void> cancelPeminjaman(int peminjamanId, int userId) async {
+  // Ambil data peminjaman saat ini
+  final currentData = await supabase
+      .from(_table)
+      .select('*, alat(*)')
+      .eq('peminjaman_id', peminjamanId)
+      .single();
 
-    if (currentData['status_peminjaman_id'] != STATUS_PENDING) {
-      throw Exception('Tidak dapat membatalkan peminjaman yang sudah diproses');
-    }
-
-    await supabase.from(_table).delete().eq('peminjaman_id', peminjamanId);
-
-    await _logService.logActivity(
-      userId: userId,
-      aktivitas: 'Cancel Peminjaman',
-      tabelTerkait: _table,
-      idTerkait: peminjamanId,
-    );
+  final statusId = currentData['status_peminjaman_id'] as int;
+  
+  // Validasi: hanya bisa membatalkan jika status Pending (1) atau Dipinjam (2)
+  if (statusId != STATUS_PENDING && statusId != STATUS_DIPINJAM) {
+    throw Exception('Peminjaman dengan status ini tidak dapat dibatalkan');
   }
+
+  // Jika status Dipinjam (2), kembalikan stok alat
+  if (statusId == STATUS_DIPINJAM) {
+    final alatId = currentData['alat_id'] as int;
+    final jumlahPinjam = currentData['jumlah_pinjam'] as int;
+    final alatData = currentData['alat'] as Map<String, dynamic>;
+    final currentStock = alatData['jumlah_tersedia'] as int;
+
+    // Kembalikan stok
+    await supabase
+        .from('alat')
+        .update({'jumlah_tersedia': currentStock + jumlahPinjam})
+        .eq('alat_id', alatId);
+  }
+
+  // Update status peminjaman menjadi Dibatalkan (6)
+  await supabase
+      .from(_table)
+      .update({'status_peminjaman_id': 6}) // Status Dibatalkan
+      .eq('peminjaman_id', peminjamanId);
+
+  await _logService.logActivity(
+    userId: userId,
+    aktivitas: 'Batalkan Peminjaman',
+    tabelTerkait: _table,
+    idTerkait: peminjamanId,
+    deskripsi: 'Peminjaman dibatalkan, status diubah menjadi Dibatalkan',
+  );
+}
 }

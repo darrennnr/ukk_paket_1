@@ -1,10 +1,12 @@
-// lib/screens/admin/data_management/user_management.dart
+﻿// lib/screens/admin/data_management/user_management.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/user_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
@@ -56,9 +58,9 @@ class _UserManagementState extends ConsumerState<UserManagement> {
             Container(
               width: 260,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 border: Border(
-                  right: BorderSide(color: Colors.grey.shade200, width: 1),
+                  right: BorderSide(color: AppColors.borderMedium, width: 1),
                 ),
               ),
               child: AdminSidebar(currentRoute: '/admin/users'),
@@ -111,17 +113,17 @@ class _UserManagementState extends ConsumerState<UserManagement> {
   PreferredSizeWidget _buildAppBar() {
     final user = ref.watch(authProvider).user;
     final userName = user?.namaLengkap ?? 'Admin';
-    
+
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: AppColors.surface,
       leading: _isDesktop
           ? null
           : IconButton(
               icon: Icon(
                 Icons.menu_rounded,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
                 size: 22,
               ),
               onPressed: () => _scaffoldKey.currentState?.openDrawer(),
@@ -143,7 +145,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: Colors.grey.shade200),
+        child: Container(height: 1, color: AppColors.borderMedium),
       ),
     );
   }
@@ -152,12 +154,13 @@ class _UserManagementState extends ConsumerState<UserManagement> {
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.borderMedium),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -173,7 +176,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                 child: Text(
                   userName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -195,7 +198,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
             Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: Colors.grey.shade600,
+              color: AppColors.textSecondary,
             ),
           ],
         ),
@@ -209,7 +212,11 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: AppColors.textPrimary,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -221,7 +228,11 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -283,7 +294,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                     'Kelola data pengguna sistem',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey,
+                      color: AppColors.textDisabled,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -338,7 +349,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
               '$count',
               style: const TextStyle(
                 fontSize: 10,
-                color: Colors.white,
+                color: AppColors.surface,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -358,27 +369,27 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           child: Container(
             height: 42,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: TextField(
               controller: _searchController,
               style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
               decoration: InputDecoration(
                 hintText: 'Cari nama, username, atau email...',
-                hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+                hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
                 prefixIcon: Icon(
                   Icons.search_rounded,
                   size: 18,
-                  color: Colors.grey.shade500,
+                  color: AppColors.textTertiary,
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: Icon(
                           Icons.close_rounded,
                           size: 16,
-                          color: Colors.grey.shade500,
+                          color: AppColors.textTertiary,
                         ),
                         onPressed: () {
                           _searchController.clear();
@@ -404,21 +415,21 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           height: 42,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String?>(
               value: _selectedRoleFilter,
               hint: Text(
                 'Role',
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
               icon: Icon(
                 Icons.arrow_drop_down_rounded,
                 size: 20,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondary,
               ),
               style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
               items: const [
@@ -460,9 +471,9 @@ class _UserManagementState extends ConsumerState<UserManagement> {
   Widget _buildDesktopTable(List<UserModel> users) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
       ),
       child: Column(
         children: [
@@ -470,7 +481,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: AppColors.surfaceContainerLowest,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(10),
               ),
@@ -520,14 +531,14 @@ class _UserManagementState extends ConsumerState<UserManagement> {
               ],
             ),
           ),
-          Divider(height: 1, color: Colors.grey.shade200),
+          Divider(height: 1, color: AppColors.borderMedium),
           // Table Body
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: users.length,
             separatorBuilder: (_, __) =>
-                Divider(height: 1, color: Colors.grey.shade100),
+                Divider(height: 1, color: AppColors.surfaceContainerLow),
             itemBuilder: (context, index) => _buildUserRow(users[index], index),
           ),
         ],
@@ -589,7 +600,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                                 user.noTelepon!,
                                 style: TextStyle(
                                   fontSize: 11,
-                                  color: Colors.grey.shade600,
+                                  color: AppColors.textSecondary,
                                 ),
                               ),
                             ],
@@ -664,7 +675,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                           : '-',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -678,7 +689,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                         icon: Icon(
                           Icons.more_vert_rounded,
                           size: 18,
-                          color: Colors.grey.shade600,
+                          color: AppColors.textSecondary,
                         ),
                         offset: const Offset(0, 35),
                         shape: RoundedRectangleBorder(
@@ -692,7 +703,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                                 Icon(
                                   Icons.visibility_outlined,
                                   size: 16,
-                                  color: Colors.grey.shade700,
+                                  color: AppColors.textPrimary,
                                 ),
                                 const SizedBox(width: 8),
                                 const Text(
@@ -713,7 +724,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                                 Icon(
                                   Icons.edit_outlined,
                                   size: 16,
-                                  color: Colors.grey.shade700,
+                                  color: AppColors.textPrimary,
                                 ),
                                 const SizedBox(width: 8),
                                 const Text(
@@ -784,9 +795,9 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -831,7 +842,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                             '@${user.username}',
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.grey.shade600,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -863,7 +874,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                     Icon(
                       Icons.email_outlined,
                       size: 14,
-                      color: Colors.grey.shade500,
+                      color: AppColors.textTertiary,
                     ),
                     const SizedBox(width: 6),
                     Expanded(
@@ -871,7 +882,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                         user.email,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade700,
+                          color: AppColors.textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -886,14 +897,14 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                       Icon(
                         Icons.phone_outlined,
                         size: 14,
-                        color: Colors.grey.shade500,
+                        color: AppColors.textTertiary,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         user.noTelepon!,
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade700,
+                          color: AppColors.textPrimary,
                         ),
                       ),
                     ],
@@ -917,7 +928,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
       case 'peminjam':
         return const Color(0xFF4CAF50);
       default:
-        return Colors.grey;
+        return AppColors.textDisabled;
     }
   }
 
@@ -934,13 +945,13 @@ class _UserManagementState extends ConsumerState<UserManagement> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.surfaceContainerLow,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.people_outline_rounded,
                 size: 48,
-                color: Colors.grey.shade400,
+                color: AppColors.textHint,
               ),
             ),
             const SizedBox(height: 16),
@@ -957,7 +968,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
               _searchController.text.isNotEmpty
                   ? 'Coba kata kunci lain'
                   : 'Tambahkan pengguna pertama',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -971,7 +982,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
   Widget _buildLoadingSkeleton() {
     return Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade200,
+            color: AppColors.borderMedium,
             borderRadius: BorderRadius.circular(10),
           ),
           height: 400,
@@ -988,7 +999,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
       onPressed: () => _showFormDialog(),
       backgroundColor: AppTheme.primaryColor,
       elevation: 2,
-      child: const Icon(Icons.add_rounded, color: Colors.white, size: 24),
+      child: const Icon(Icons.add_rounded, color: AppColors.surface, size: 24),
     );
   }
 
@@ -1000,6 +1011,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: _isDesktop ? 450 : double.infinity,
@@ -1086,7 +1098,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                         onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          side: BorderSide(color: Colors.grey.shade300),
+                          side: BorderSide(color: AppColors.borderDark),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -1146,7 +1158,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1184,6 +1196,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         contentPadding: const EdgeInsets.all(20),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1208,7 +1221,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
             const SizedBox(height: 8),
             Text(
               'Apakah Anda yakin ingin menghapus "${user.namaLengkap}"?',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -1219,7 +1232,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: AppColors.borderDark),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1401,6 +1414,7 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      backgroundColor: AppColors.surface,
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 500, maxHeight: 650),
         child: Column(
@@ -1445,7 +1459,7 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
                 ],
               ),
             ),
-            Divider(height: 1, color: Colors.grey.shade200),
+            Divider(height: 1, color: AppColors.borderMedium),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -1490,7 +1504,7 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
                 ),
               ),
             ),
-            Divider(height: 1, color: Colors.grey.shade200),
+            Divider(height: 1, color: AppColors.borderMedium),
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -1502,7 +1516,7 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
                           : () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: AppColors.borderDark),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -1512,6 +1526,7 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
+                          color: Color(0xFF1A1A1A),
                         ),
                       ),
                     ),
@@ -1534,7 +1549,7 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
                               width: 16,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.white,
+                                color: AppColors.surface,
                               ),
                             )
                           : const Text(
@@ -1542,6 +1557,7 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
+                                color: AppColors.surface,
                               ),
                             ),
                     ),
@@ -1582,20 +1598,20 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
           style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+            hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: AppColors.surfaceContainerLowest,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -1644,9 +1660,9 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
             hintText: widget.user == null
                 ? 'Masukkan password'
                 : 'Masukkan password baru (opsional)',
-            hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+            hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: AppColors.surfaceContainerLowest,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
@@ -1657,18 +1673,18 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
                     ? Icons.visibility_off_outlined
                     : Icons.visibility_outlined,
                 size: 18,
-                color: Colors.grey.shade500,
+                color: AppColors.textTertiary,
               ),
               onPressed: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -1706,18 +1722,18 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
           value: _selectedRoleId,
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: AppColors.surfaceContainerLowest,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: AppColors.borderMedium),
             ),
           ),
           items: const [

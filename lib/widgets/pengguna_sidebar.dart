@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart' hide AppTheme;
 import '../providers/auth_provider.dart';
 
 class PenggunaSidebar extends ConsumerWidget {
@@ -21,11 +22,11 @@ class PenggunaSidebar extends ConsumerWidget {
         Widget sidebarContent = Container(
           width: isDrawerMode ? null : 260,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             border: isDrawerMode
                 ? null
                 : Border(
-                    right: BorderSide(color: Colors.grey.shade200, width: 1),
+                    right: BorderSide(color: AppColors.borderMedium, width: 1),
                   ),
           ),
           child: Column(
@@ -35,7 +36,7 @@ class PenggunaSidebar extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+                    bottom: BorderSide(color: AppColors.borderMedium, width: 1),
                   ),
                 ),
                 child: Row(
@@ -51,7 +52,7 @@ class PenggunaSidebar extends ConsumerWidget {
                         child: Text(
                           (user?.namaLengkap ?? 'P')[0].toUpperCase(),
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textInverse,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -69,7 +70,7 @@ class PenggunaSidebar extends ConsumerWidget {
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Color(0xFF1A1A1A),
+                              color: AppColors.textPrimary,
                               letterSpacing: -0.1,
                             ),
                             maxLines: 1,
@@ -78,9 +79,9 @@ class PenggunaSidebar extends ConsumerWidget {
                           const SizedBox(height: 2),
                           Text(
                             'Peminjam',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 11,
-                              color: Colors.grey.shade600,
+                              color: AppColors.textSecondary,
                               letterSpacing: 0,
                             ),
                           ),
@@ -143,11 +144,11 @@ class PenggunaSidebar extends ConsumerWidget {
 
                     const SizedBox(height: 4),
 
-                    // History Peminjaman
+                    // Peminjaman Anda
                     _buildMenuItem(
                       context,
                       icon: Icons.history_rounded,
-                      title: 'History Peminjaman',
+                      title: 'Peminjaman Anda',
                       route: '/peminjam/history',
                       isActive: currentRoute == '/peminjam/history',
                     ),
@@ -229,7 +230,7 @@ class PenggunaSidebar extends ConsumerWidget {
                   size: 18,
                   color: isActive
                       ? AppTheme.primaryColor
-                      : Colors.grey.shade600,
+                      : AppColors.textSecondary,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -240,7 +241,7 @@ class PenggunaSidebar extends ConsumerWidget {
                       fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                       color: isActive
                           ? AppTheme.primaryColor
-                          : const Color(0xFF1A1A1A),
+                          : AppColors.textPrimary,
                       letterSpacing: -0.1,
                     ),
                   ),
@@ -284,7 +285,7 @@ class PenggunaSidebar extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: Row(
               children: [
@@ -353,9 +354,9 @@ class PenggunaSidebar extends ConsumerWidget {
             const SizedBox(height: 16),
             Text(
               'Apakah Anda yakin ingin keluar dari sistem?',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
                 height: 1.4,
               ),
             ),
@@ -371,12 +372,12 @@ class PenggunaSidebar extends ConsumerWidget {
                       vertical: 10,
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Batal',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade700,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -403,7 +404,7 @@ class PenggunaSidebar extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.textInverse,
                     ),
                   ),
                 ),

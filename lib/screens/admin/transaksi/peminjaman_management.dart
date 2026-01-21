@@ -1,4 +1,4 @@
-// lib/screens/admin/transaksi/peminjaman_management.dart
+﻿// lib/screens/admin/transaksi/peminjaman_management.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -6,6 +6,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/peminjaman_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
@@ -70,9 +72,9 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             Container(
               width: 260,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 border: Border(
-                  right: BorderSide(color: Colors.grey.shade200, width: 1),
+                  right: BorderSide(color: AppColors.borderMedium, width: 1),
                 ),
               ),
               child: AdminSidebar(currentRoute: '/admin/peminjaman'),
@@ -105,17 +107,17 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
   PreferredSizeWidget _buildAppBar() {
     final user = ref.watch(authProvider).user;
     final userName = user?.namaLengkap ?? 'Admin';
-    
+
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: AppColors.surface,
       leading: _isDesktop
           ? null
           : IconButton(
               icon: Icon(
                 Icons.menu_rounded,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
                 size: 22,
               ),
               onPressed: () => _scaffoldKey.currentState?.openDrawer(),
@@ -137,7 +139,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: Colors.grey.shade200),
+        child: Container(height: 1, color: AppColors.borderMedium),
       ),
     );
   }
@@ -146,12 +148,13 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.borderMedium),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -167,7 +170,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                 child: Text(
                   userName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -189,7 +192,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: Colors.grey.shade600,
+              color: AppColors.textSecondary,
             ),
           ],
         ),
@@ -203,7 +206,11 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: AppColors.textPrimary,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -215,7 +222,11 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -242,13 +253,13 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
     final activeCount = ref.watch(peminjamanAktifCountProvider);
 
     return Container(
-      color: Colors.white,
+      color: AppColors.surface,
       child: Column(
         children: [
           TabBar(
             controller: _tabController,
             labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: Colors.grey.shade600,
+            unselectedLabelColor: AppColors.textSecondary,
             labelStyle: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -292,7 +303,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
               ),
             ],
           ),
-          Divider(height: 1, color: Colors.grey.shade200),
+          Divider(height: 1, color: AppColors.borderMedium),
         ],
       ),
     );
@@ -302,7 +313,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: isActive ? AppTheme.primaryColor : Colors.grey.shade300,
+        color: isActive ? AppTheme.primaryColor : AppColors.borderDark,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -310,7 +321,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w700,
-          color: isActive ? Colors.white : Colors.grey.shade700,
+          color: isActive ? AppColors.surface : AppColors.textPrimary,
         ),
       ),
     );
@@ -459,7 +470,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
               '$count data ditemukan',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -471,7 +482,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           label: const Text('Tambah Peminjaman'),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppTheme.primaryColor,
-            foregroundColor: Colors.white,
+            foregroundColor: AppColors.surface,
             elevation: 0,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             shape: RoundedRectangleBorder(
@@ -493,27 +504,27 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           child: Container(
             height: 42,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: TextField(
               controller: _searchController,
               style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
               decoration: InputDecoration(
                 hintText: 'Cari kode peminjaman, nama peminjam...',
-                hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+                hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
                 prefixIcon: Icon(
                   Icons.search_rounded,
                   size: 18,
-                  color: Colors.grey.shade500,
+                  color: AppColors.textTertiary,
                 ),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: Icon(
                           Icons.close_rounded,
                           size: 16,
-                          color: Colors.grey.shade500,
+                          color: AppColors.textTertiary,
                         ),
                         onPressed: () {
                           setState(() {
@@ -540,21 +551,21 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           height: 42,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<int?>(
               value: _selectedStatusFilter,
               hint: Text(
                 'Status',
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
               ),
               icon: Icon(
                 Icons.arrow_drop_down_rounded,
                 size: 20,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondary,
               ),
               style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
               items: const [
@@ -637,9 +648,9 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
       ),
       child: Column(
         children: [
@@ -647,7 +658,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: AppColors.surfaceContainerLowest,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(10),
               ),
@@ -693,14 +704,14 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
               ],
             ),
           ),
-          Divider(height: 1, color: Colors.grey.shade200),
+          Divider(height: 1, color: AppColors.borderMedium),
           // Table Body
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: peminjamans.length,
             separatorBuilder: (_, __) =>
-                Divider(height: 1, color: Colors.grey.shade100),
+                Divider(height: 1, color: AppColors.surfaceContainerLow),
             itemBuilder: (context, index) => _buildPeminjamanRow(
               peminjamans[index],
               index,
@@ -742,7 +753,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                         'Qty: ${peminjaman.jumlahPinjam}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey.shade600,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -766,13 +777,14 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                   flex: 2,
                   child: Row(
                     children: [
-                      if (peminjaman.alat?.fotoAlat != null && peminjaman.alat!.fotoAlat!.isNotEmpty)
+                      if (peminjaman.alat?.fotoAlat != null &&
+                          peminjaman.alat!.fotoAlat!.isNotEmpty)
                         Container(
                           width: 32,
                           height: 32,
                           margin: const EdgeInsets.only(right: 8),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: AppColors.surfaceContainerLow,
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: ClipRRect(
@@ -785,7 +797,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               errorBuilder: (_, __, ___) => Icon(
                                 Icons.inventory_2_outlined,
                                 size: 16,
-                                color: Colors.grey.shade400,
+                                color: AppColors.textHint,
                               ),
                             ),
                           ),
@@ -826,7 +838,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                         'Sampai: ${DateFormat('dd MMM yyyy').format(peminjaman.tanggalBerakhir)}',
                         style: TextStyle(
                           fontSize: 11,
-                          color: Colors.grey.shade600,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -873,7 +885,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               icon: Icon(
                                 Icons.more_vert_rounded,
                                 size: 18,
-                                color: Colors.grey.shade600,
+                                color: AppColors.textSecondary,
                               ),
                               offset: const Offset(0, 35),
                               shape: RoundedRectangleBorder(
@@ -887,7 +899,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                       Icon(
                                         Icons.visibility_outlined,
                                         size: 16,
-                                        color: Colors.grey.shade700,
+                                        color: AppColors.textPrimary,
                                       ),
                                       const SizedBox(width: 8),
                                       const Text(
@@ -910,7 +922,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                         Icon(
                                           Icons.edit_outlined,
                                           size: 16,
-                                          color: Colors.grey.shade700,
+                                          color: AppColors.textPrimary,
                                         ),
                                         const SizedBox(width: 8),
                                         const Text(
@@ -1009,9 +1021,9 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1097,7 +1109,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF4CAF50),
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppColors.surface,
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             shape: RoundedRectangleBorder(
@@ -1121,12 +1133,12 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
   Widget _buildInfoRow(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: Colors.grey.shade500),
+        Icon(icon, size: 14, color: AppColors.textTertiary),
         const SizedBox(width: 8),
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+              style: TextStyle(fontSize: 12, color: AppColors.textPrimary),
               children: [
                 TextSpan(
                   text: '$label: ',
@@ -1168,7 +1180,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
         color = const Color(0xFF4CAF50);
         break;
       default:
-        color = Colors.grey;
+        color = AppColors.textDisabled;
     }
 
     return Container(
@@ -1198,6 +1210,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: _isDesktop ? 500 : double.infinity,
@@ -1361,7 +1374,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -1389,6 +1402,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         contentPadding: const EdgeInsets.all(20),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1413,7 +1427,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             const SizedBox(height: 8),
             Text(
               'Peminjaman dengan kode "${peminjaman.kodePeminjaman}" akan disetujui dan stok alat akan dikurangi.',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -1424,7 +1438,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: AppColors.borderDark),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1508,6 +1522,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         contentPadding: const EdgeInsets.all(20),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1543,7 +1558,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             const SizedBox(height: 16),
             Text(
               'Berikan alasan penolakan untuk peminjaman "${peminjaman.kodePeminjaman}"',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -1552,17 +1567,17 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
               style: const TextStyle(fontSize: 13),
               decoration: InputDecoration(
                 hintText: 'Masukkan alasan penolakan...',
-                hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+                hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
                 filled: true,
-                fillColor: Colors.grey.shade50,
+                fillColor: AppColors.surfaceContainerLowest,
                 contentPadding: const EdgeInsets.all(12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide(color: AppColors.borderMedium),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade200),
+                  borderSide: BorderSide(color: AppColors.borderMedium),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -1581,7 +1596,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: AppColors.borderDark),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -1686,13 +1701,13 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.surfaceContainerLow,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.assignment_outlined,
                 size: 48,
-                color: Colors.grey.shade400,
+                color: AppColors.textHint,
               ),
             ),
             const SizedBox(height: 16),
@@ -1709,7 +1724,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
               _searchQuery.isNotEmpty
                   ? 'Coba kata kunci lain'
                   : 'Belum ada data',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -1723,7 +1738,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
   Widget _buildLoadingSkeleton() {
     return Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade200,
+            color: AppColors.borderMedium,
             borderRadius: BorderRadius.circular(10),
           ),
           height: 400,
@@ -1765,6 +1780,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            backgroundColor: AppColors.surface,
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: _isDesktop ? 500 : double.infinity,
@@ -1780,7 +1796,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         border: Border(
-                          bottom: BorderSide(color: Colors.grey.shade200),
+                          bottom: BorderSide(color: AppColors.borderMedium),
                         ),
                       ),
                       child: Row(
@@ -1833,13 +1849,15 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               value: selectedPeminjamId,
                               decoration: _inputDecoration('Pilih peminjam'),
                               items: peminjamList
-                                  .map((u) => DropdownMenuItem(
-                                        value: u.userId,
-                                        child: Text(
-                                          u.namaLengkap,
-                                          style: const TextStyle(fontSize: 13),
-                                        ),
-                                      ))
+                                  .map(
+                                    (u) => DropdownMenuItem(
+                                      value: u.userId,
+                                      child: Text(
+                                        u.namaLengkap,
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                  )
                                   .toList(),
                               onChanged: (v) =>
                                   setDialogState(() => selectedPeminjamId = v),
@@ -1855,13 +1873,15 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               value: selectedAlatId,
                               decoration: _inputDecoration('Pilih alat'),
                               items: alatsState.alats
-                                  .map((a) => DropdownMenuItem(
-                                        value: a.alatId,
-                                        child: Text(
-                                          '${a.namaAlat} (Stok: ${a.jumlahTersedia})',
-                                          style: const TextStyle(fontSize: 13),
-                                        ),
-                                      ))
+                                  .map(
+                                    (a) => DropdownMenuItem(
+                                      value: a.alatId,
+                                      child: Text(
+                                        '${a.namaAlat} (Stok: ${a.jumlahTersedia})',
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                  )
                                   .toList(),
                               onChanged: (v) =>
                                   setDialogState(() => selectedAlatId = v),
@@ -1902,11 +1922,14 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   context: context,
                                   initialDate: tanggalBerakhir,
                                   firstDate: DateTime.now(),
-                                  lastDate: DateTime.now()
-                                      .add(const Duration(days: 365)),
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 365),
+                                  ),
                                 );
                                 if (picked != null) {
-                                  setDialogState(() => tanggalBerakhir = picked);
+                                  setDialogState(
+                                    () => tanggalBerakhir = picked,
+                                  );
                                 }
                               },
                               child: Container(
@@ -1915,8 +1938,10 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   vertical: 14,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade50,
-                                  border: Border.all(color: Colors.grey.shade200),
+                                  color: AppColors.surfaceContainerLowest,
+                                  border: Border.all(
+                                    color: AppColors.borderMedium,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
@@ -1924,12 +1949,13 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                     Icon(
                                       Icons.calendar_today_outlined,
                                       size: 16,
-                                      color: Colors.grey.shade600,
+                                      color: AppColors.textSecondary,
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
-                                      DateFormat('dd MMMM yyyy')
-                                          .format(tanggalBerakhir),
+                                      DateFormat(
+                                        'dd MMMM yyyy',
+                                      ).format(tanggalBerakhir),
                                       style: const TextStyle(fontSize: 13),
                                     ),
                                   ],
@@ -1962,9 +1988,16 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   value: 1,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.hourglass_empty_rounded, size: 16, color: Color(0xFFFF9800)),
+                                      Icon(
+                                        Icons.hourglass_empty_rounded,
+                                        size: 16,
+                                        color: Color(0xFFFF9800),
+                                      ),
                                       SizedBox(width: 8),
-                                      Text('Pending', style: TextStyle(fontSize: 13)),
+                                      Text(
+                                        'Pending',
+                                        style: TextStyle(fontSize: 13),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -1972,9 +2005,16 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   value: 2,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF4CAF50)),
+                                      Icon(
+                                        Icons.check_circle_rounded,
+                                        size: 16,
+                                        color: Color(0xFF4CAF50),
+                                      ),
                                       SizedBox(width: 8),
-                                      Text('Diterima / Dipinjam', style: TextStyle(fontSize: 13)),
+                                      Text(
+                                        'Diterima / Dipinjam',
+                                        style: TextStyle(fontSize: 13),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -1982,15 +2022,23 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   value: 3,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.cancel_rounded, size: 16, color: Color(0xFFFF5252)),
+                                      Icon(
+                                        Icons.cancel_rounded,
+                                        size: 16,
+                                        color: Color(0xFFFF5252),
+                                      ),
                                       SizedBox(width: 8),
-                                      Text('Ditolak', style: TextStyle(fontSize: 13)),
+                                      Text(
+                                        'Ditolak',
+                                        style: TextStyle(fontSize: 13),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ],
-                              onChanged: (v) =>
-                                  setDialogState(() => selectedStatusId = v ?? 1),
+                              onChanged: (v) => setDialogState(
+                                () => selectedStatusId = v ?? 1,
+                              ),
                             ),
 
                             // Catatan Petugas (muncul jika status ditolak)
@@ -2006,7 +2054,8 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                 ),
                                 style: const TextStyle(fontSize: 13),
                                 validator: (v) {
-                                  if (selectedStatusId == 3 && (v == null || v.trim().isEmpty)) {
+                                  if (selectedStatusId == 3 &&
+                                      (v == null || v.trim().isEmpty)) {
                                     return 'Alasan penolakan wajib diisi';
                                   }
                                   return null;
@@ -2022,7 +2071,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         border: Border(
-                          top: BorderSide(color: Colors.grey.shade200),
+                          top: BorderSide(color: AppColors.borderMedium),
                         ),
                       ),
                       child: Row(
@@ -2031,9 +2080,10 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                             child: OutlinedButton(
                               onPressed: () => Navigator.pop(context),
                               style: OutlinedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                side: BorderSide(color: AppColors.borderDark),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -2043,6 +2093,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1A1A1A),
                                 ),
                               ),
                             ),
@@ -2059,17 +2110,24 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
 
                                 Navigator.pop(context);
 
-                                final petugasId = ref.read(authProvider).user?.userId;
+                                final petugasId = ref
+                                    .read(authProvider)
+                                    .user
+                                    ?.userId;
                                 final peminjaman = PeminjamanModel(
                                   peminjamanId: 0,
                                   peminjamId: selectedPeminjamId,
                                   alatId: selectedAlatId,
-                                  petugasId: selectedStatusId != 1 ? petugasId : null,
+                                  petugasId: selectedStatusId != 1
+                                      ? petugasId
+                                      : null,
                                   kodePeminjaman:
                                       'PMJ-${const Uuid().v4().substring(0, 8).toUpperCase()}',
                                   jumlahPinjam: jumlahPinjam,
                                   tanggalBerakhir: tanggalBerakhir,
-                                  tanggalPinjam: selectedStatusId == 2 ? DateTime.now() : null,
+                                  tanggalPinjam: selectedStatusId == 2
+                                      ? DateTime.now()
+                                      : null,
                                   keperluan: keperluanController.text.isEmpty
                                       ? null
                                       : keperluanController.text,
@@ -2106,8 +2164,9 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.primaryColor,
                                 elevation: 0,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -2117,6 +2176,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
+                                  color: AppColors.surface,
                                 ),
                               ),
                             ),
@@ -2144,10 +2204,12 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
     int jumlahPinjam = peminjaman.jumlahPinjam;
     int selectedStatusId = peminjaman.statusPeminjamanId ?? 1;
     DateTime tanggalBerakhir = peminjaman.tanggalBerakhir;
-    final keperluanController =
-        TextEditingController(text: peminjaman.keperluan ?? '');
-    final catatanPetugasController =
-        TextEditingController(text: peminjaman.catatanPetugas ?? '');
+    final keperluanController = TextEditingController(
+      text: peminjaman.keperluan ?? '',
+    );
+    final catatanPetugasController = TextEditingController(
+      text: peminjaman.catatanPetugas ?? '',
+    );
     final formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -2160,6 +2222,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            backgroundColor: AppColors.surface,
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: _isDesktop ? 500 : double.infinity,
@@ -2175,7 +2238,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         border: Border(
-                          bottom: BorderSide(color: Colors.grey.shade200),
+                          bottom: BorderSide(color: AppColors.borderMedium),
                         ),
                       ),
                       child: Row(
@@ -2208,7 +2271,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   peminjaman.kodePeminjaman,
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: Colors.grey.shade600,
+                                    color: AppColors.textSecondary,
                                   ),
                                 ),
                               ],
@@ -2240,13 +2303,15 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               value: selectedAlatId,
                               decoration: _inputDecoration('Pilih alat'),
                               items: alatsState.alats
-                                  .map((a) => DropdownMenuItem(
-                                        value: a.alatId,
-                                        child: Text(
-                                          '${a.namaAlat} (Stok: ${a.jumlahTersedia})',
-                                          style: const TextStyle(fontSize: 13),
-                                        ),
-                                      ))
+                                  .map(
+                                    (a) => DropdownMenuItem(
+                                      value: a.alatId,
+                                      child: Text(
+                                        '${a.namaAlat} (Stok: ${a.jumlahTersedia})',
+                                        style: const TextStyle(fontSize: 13),
+                                      ),
+                                    ),
+                                  )
                                   .toList(),
                               onChanged: (v) =>
                                   setDialogState(() => selectedAlatId = v),
@@ -2285,11 +2350,14 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   context: context,
                                   initialDate: tanggalBerakhir,
                                   firstDate: DateTime.now(),
-                                  lastDate: DateTime.now()
-                                      .add(const Duration(days: 365)),
+                                  lastDate: DateTime.now().add(
+                                    const Duration(days: 365),
+                                  ),
                                 );
                                 if (picked != null) {
-                                  setDialogState(() => tanggalBerakhir = picked);
+                                  setDialogState(
+                                    () => tanggalBerakhir = picked,
+                                  );
                                 }
                               },
                               child: Container(
@@ -2298,9 +2366,10 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   vertical: 14,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade50,
-                                  border:
-                                      Border.all(color: Colors.grey.shade200),
+                                  color: AppColors.surfaceContainerLowest,
+                                  border: Border.all(
+                                    color: AppColors.borderMedium,
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
@@ -2308,12 +2377,13 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                     Icon(
                                       Icons.calendar_today_outlined,
                                       size: 16,
-                                      color: Colors.grey.shade600,
+                                      color: AppColors.textSecondary,
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
-                                      DateFormat('dd MMMM yyyy')
-                                          .format(tanggalBerakhir),
+                                      DateFormat(
+                                        'dd MMMM yyyy',
+                                      ).format(tanggalBerakhir),
                                       style: const TextStyle(fontSize: 13),
                                     ),
                                   ],
@@ -2346,9 +2416,16 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   value: 1,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.hourglass_empty_rounded, size: 16, color: Color(0xFFFF9800)),
+                                      Icon(
+                                        Icons.hourglass_empty_rounded,
+                                        size: 16,
+                                        color: Color(0xFFFF9800),
+                                      ),
                                       SizedBox(width: 8),
-                                      Text('Pending', style: TextStyle(fontSize: 13)),
+                                      Text(
+                                        'Pending',
+                                        style: TextStyle(fontSize: 13),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -2356,9 +2433,16 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   value: 2,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.check_circle_rounded, size: 16, color: Color(0xFF4CAF50)),
+                                      Icon(
+                                        Icons.check_circle_rounded,
+                                        size: 16,
+                                        color: Color(0xFF4CAF50),
+                                      ),
                                       SizedBox(width: 8),
-                                      Text('Diterima / Dipinjam', style: TextStyle(fontSize: 13)),
+                                      Text(
+                                        'Diterima / Dipinjam',
+                                        style: TextStyle(fontSize: 13),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -2366,15 +2450,23 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                   value: 3,
                                   child: Row(
                                     children: [
-                                      Icon(Icons.cancel_rounded, size: 16, color: Color(0xFFFF5252)),
+                                      Icon(
+                                        Icons.cancel_rounded,
+                                        size: 16,
+                                        color: Color(0xFFFF5252),
+                                      ),
                                       SizedBox(width: 8),
-                                      Text('Ditolak', style: TextStyle(fontSize: 13)),
+                                      Text(
+                                        'Ditolak',
+                                        style: TextStyle(fontSize: 13),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ],
-                              onChanged: (v) =>
-                                  setDialogState(() => selectedStatusId = v ?? 1),
+                              onChanged: (v) => setDialogState(
+                                () => selectedStatusId = v ?? 1,
+                              ),
                             ),
 
                             // Catatan Petugas (muncul jika status ditolak)
@@ -2390,7 +2482,8 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                 ),
                                 style: const TextStyle(fontSize: 13),
                                 validator: (v) {
-                                  if (selectedStatusId == 3 && (v == null || v.trim().isEmpty)) {
+                                  if (selectedStatusId == 3 &&
+                                      (v == null || v.trim().isEmpty)) {
                                     return 'Alasan penolakan wajib diisi';
                                   }
                                   return null;
@@ -2406,7 +2499,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         border: Border(
-                          top: BorderSide(color: Colors.grey.shade200),
+                          top: BorderSide(color: AppColors.borderMedium),
                         ),
                       ),
                       child: Row(
@@ -2415,9 +2508,10 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                             child: OutlinedButton(
                               onPressed: () => Navigator.pop(context),
                               style: OutlinedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                side: BorderSide(color: Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                                side: BorderSide(color: AppColors.borderDark),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -2427,6 +2521,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1A1A1A),
                                 ),
                               ),
                             ),
@@ -2439,14 +2534,20 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
 
                                 Navigator.pop(context);
 
-                                final petugasId = ref.read(authProvider).user?.userId;
-                                final oldStatusId = peminjaman.statusPeminjamanId ?? 1;
-                                
+                                final petugasId = ref
+                                    .read(authProvider)
+                                    .user
+                                    ?.userId;
+                                final oldStatusId =
+                                    peminjaman.statusPeminjamanId ?? 1;
+
                                 final updated = peminjaman.copyWith(
                                   alatId: selectedAlatId,
                                   jumlahPinjam: jumlahPinjam,
                                   tanggalBerakhir: tanggalBerakhir,
-                                  tanggalPinjam: selectedStatusId == 2 && peminjaman.tanggalPinjam == null
+                                  tanggalPinjam:
+                                      selectedStatusId == 2 &&
+                                          peminjaman.tanggalPinjam == null
                                       ? DateTime.now()
                                       : peminjaman.tanggalPinjam,
                                   keperluan: keperluanController.text.isEmpty
@@ -2456,7 +2557,9 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                       ? catatanPetugasController.text.trim()
                                       : null,
                                   statusPeminjamanId: selectedStatusId,
-                                  petugasId: selectedStatusId != 1 ? petugasId : peminjaman.petugasId,
+                                  petugasId: selectedStatusId != 1
+                                      ? petugasId
+                                      : peminjaman.petugasId,
                                 );
 
                                 final success = await ref
@@ -2491,8 +2594,9 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF2196F3),
                                 elevation: 0,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -2502,6 +2606,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
+                                  color: AppColors.surface,
                                 ),
                               ),
                             ),
@@ -2527,6 +2632,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         contentPadding: const EdgeInsets.all(20),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -2551,7 +2657,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             const SizedBox(height: 8),
             Text(
               'Peminjaman dengan kode "${peminjaman.kodePeminjaman}" akan dihapus permanen.',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              style: TextStyle(fontSize: 13, color: AppColors.textPrimary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -2562,7 +2668,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: AppColors.borderDark),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -2653,17 +2759,17 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+      hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
       filled: true,
-      fillColor: Colors.grey.shade50,
+      fillColor: AppColors.surfaceContainerLowest,
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey.shade200),
+        borderSide: BorderSide(color: AppColors.borderMedium),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey.shade200),
+        borderSide: BorderSide(color: AppColors.borderMedium),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),

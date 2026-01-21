@@ -1,10 +1,12 @@
-// lib/screens/admin/laporan&activity/log_activity.dart
+﻿// lib/screens/admin/laporan&activity/log_activity.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/admin_sidebar.dart';
 import 'package:paket_3_training/providers/log_aktivitas_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
@@ -58,9 +60,9 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
             Container(
               width: 260,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 border: Border(
-                  right: BorderSide(color: Colors.grey.shade200, width: 1),
+                  right: BorderSide(color: AppColors.borderMedium, width: 1),
                 ),
               ),
               child: AdminSidebar(currentRoute: '/admin/log-aktivitas'),
@@ -173,17 +175,17 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
   PreferredSizeWidget _buildAppBar() {
     final user = ref.watch(authProvider).user;
     final userName = user?.namaLengkap ?? 'Admin';
-    
+
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: AppColors.surface,
       leading: _isDesktop
           ? null
           : IconButton(
               icon: Icon(
                 Icons.menu_rounded,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
                 size: 22,
               ),
               onPressed: () => _scaffoldKey.currentState?.openDrawer(),
@@ -205,7 +207,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: Colors.grey.shade200),
+        child: Container(height: 1, color: AppColors.borderMedium),
       ),
     );
   }
@@ -214,12 +216,13 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.borderMedium),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -235,7 +238,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                 child: Text(
                   userName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -257,7 +260,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
             Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: Colors.grey.shade600,
+              color: AppColors.textSecondary,
             ),
           ],
         ),
@@ -271,7 +274,11 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: AppColors.textPrimary,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -283,7 +290,11 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -330,7 +341,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                     'Total $totalLogs aktivitas tercatat',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -397,9 +408,9 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -421,7 +432,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 10,
-                  color: Colors.grey.shade600,
+                  color: AppColors.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -451,27 +462,27 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
         Container(
           height: 42,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: TextField(
             controller: _searchController,
             style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
             decoration: InputDecoration(
               hintText: 'Cari aktivitas, user, atau deskripsi...',
-              hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade400),
+              hintStyle: TextStyle(fontSize: 13, color: AppColors.textHint),
               prefixIcon: Icon(
                 Icons.search_rounded,
                 size: 18,
-                color: Colors.grey.shade500,
+                color: AppColors.textTertiary,
               ),
               suffixIcon: _searchController.text.isNotEmpty
                   ? IconButton(
                       icon: Icon(
                         Icons.close_rounded,
                         size: 16,
-                        color: Colors.grey.shade500,
+                        color: AppColors.textTertiary,
                       ),
                       onPressed: () {
                         _searchController.clear();
@@ -497,9 +508,9 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                 height: 42,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade200, width: 1),
+                  border: Border.all(color: AppColors.borderMedium, width: 1),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String?>(
@@ -508,13 +519,13 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                       'Tipe Aktivitas',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey.shade600,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                     icon: Icon(
                       Icons.arrow_drop_down_rounded,
                       size: 20,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                     ),
                     isExpanded: true,
                     style: const TextStyle(
@@ -545,9 +556,9 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                 height: 42,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade200, width: 1),
+                  border: Border.all(color: AppColors.borderMedium, width: 1),
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
@@ -555,7 +566,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                     icon: Icon(
                       Icons.arrow_drop_down_rounded,
                       size: 20,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                     ),
                     isExpanded: true,
                     style: const TextStyle(
@@ -602,9 +613,9 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
   Widget _buildDesktopTable(List<LogAktivitasModel> logs) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
       ),
       child: Column(
         children: [
@@ -612,7 +623,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: AppColors.surfaceContainerLowest,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(10),
               ),
@@ -655,14 +666,14 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
               ],
             ),
           ),
-          Divider(height: 1, color: Colors.grey.shade200),
+          Divider(height: 1, color: AppColors.borderMedium),
           // Table Body
           ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: logs.length,
             separatorBuilder: (_, __) =>
-                Divider(height: 1, color: Colors.grey.shade100),
+                Divider(height: 1, color: AppColors.surfaceContainerLow),
             itemBuilder: (context, index) => _buildLogRow(logs[index], index),
           ),
         ],
@@ -722,7 +733,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                               '@${log.user?.username ?? 'unknown'}',
                               style: TextStyle(
                                 fontSize: 10,
-                                color: Colors.grey.shade600,
+                                color: AppColors.textSecondary,
                               ),
                             ),
                           ],
@@ -772,7 +783,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                       log.deskripsi ?? '-',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.grey.shade700,
+                        color: AppColors.textPrimary,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -801,7 +812,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                             : '-',
                         style: TextStyle(
                           fontSize: 10,
-                          color: Colors.grey.shade600,
+                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -814,7 +825,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                     icon: Icon(
                       Icons.visibility_outlined,
                       size: 16,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                     ),
                     onPressed: () => _showDetailDialog(log),
                     padding: EdgeInsets.zero,
@@ -852,9 +863,9 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           child: Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
+              border: Border.all(color: AppColors.borderMedium, width: 1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -899,7 +910,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                             '@${log.user?.username ?? 'unknown'}',
                             style: TextStyle(
                               fontSize: 10,
-                              color: Colors.grey.shade600,
+                              color: AppColors.textSecondary,
                             ),
                           ),
                         ],
@@ -926,9 +937,9 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
+                    color: AppColors.surfaceContainerLowest,
                     borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Colors.grey.shade200, width: 1),
+                    border: Border.all(color: AppColors.borderMedium, width: 1),
                   ),
                   child: Text(
                     log.aktivitas,
@@ -943,7 +954,10 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                   const SizedBox(height: 8),
                   Text(
                     log.deskripsi!,
-                    style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textPrimary,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -954,7 +968,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                     Icon(
                       Icons.access_time_rounded,
                       size: 12,
-                      color: Colors.grey.shade500,
+                      color: AppColors.textTertiary,
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -965,7 +979,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                           : '-',
                       style: TextStyle(
                         fontSize: 10,
-                        color: Colors.grey.shade600,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -1019,7 +1033,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
     }
     return {
       'icon': Icons.info_outline_rounded,
-      'color': Colors.grey,
+      'color': AppColors.textDisabled,
       'label': 'Lainnya',
     };
   }
@@ -1037,13 +1051,13 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade100,
+                color: AppColors.surfaceContainerLow,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.history_rounded,
                 size: 48,
-                color: Colors.grey.shade400,
+                color: AppColors.textHint,
               ),
             ),
             const SizedBox(height: 16),
@@ -1062,7 +1076,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                       _selectedDateFilter != 'all'
                   ? 'Coba ubah filter pencarian'
                   : 'Belum ada aktivitas yang tercatat',
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -1076,7 +1090,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
   Widget _buildLoadingSkeleton() {
     return Container(
           decoration: BoxDecoration(
-            color: Colors.grey.shade200,
+            color: AppColors.borderMedium,
             borderRadius: BorderRadius.circular(10),
           ),
           height: 400,
@@ -1095,6 +1109,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppColors.surface,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: _isDesktop ? 500 : double.infinity,
@@ -1143,7 +1158,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                   ],
                 ),
               ),
-              Divider(height: 1, color: Colors.grey.shade200),
+              Divider(height: 1, color: AppColors.borderMedium),
               // Content
               Expanded(
                 child: SingleChildScrollView(
@@ -1181,10 +1196,10 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
+                              color: AppColors.surfaceContainerLowest,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: Colors.grey.shade200,
+                                color: AppColors.borderMedium,
                                 width: 1,
                               ),
                             ),
@@ -1192,7 +1207,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                               log.deskripsi!,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: Colors.grey.shade800,
+                                color: AppColors.textDisabled,
                                 height: 1.5,
                               ),
                             ),
@@ -1225,10 +1240,10 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
+                              color: AppColors.surfaceContainerLowest,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: Colors.grey.shade200,
+                                color: AppColors.borderMedium,
                                 width: 1,
                               ),
                             ),
@@ -1236,7 +1251,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                               log.userAgent!,
                               style: TextStyle(
                                 fontSize: 11,
-                                color: Colors.grey.shade700,
+                                color: AppColors.textPrimary,
                                 fontFamily: 'monospace',
                               ),
                             ),
@@ -1247,7 +1262,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
                   ),
                 ),
               ),
-              Divider(height: 1, color: Colors.grey.shade200),
+              Divider(height: 1, color: AppColors.borderMedium),
               // Footer
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -1289,7 +1304,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade600,
+            color: AppColors.textSecondary,
             letterSpacing: 0.5,
           ),
         ),
@@ -1297,7 +1312,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade200, width: 1),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(children: children),
@@ -1318,7 +1333,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
               label,
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: AppColors.textSecondary,
                 fontWeight: FontWeight.w500,
               ),
             ),

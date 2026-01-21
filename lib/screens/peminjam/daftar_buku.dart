@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart' hide AppTheme;
 import 'package:paket_3_training/widgets/pengguna_sidebar.dart';
 import '../../providers/alat_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -23,7 +24,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
   bool _hasInitializedProviders = false;
 
   bool get _isDesktop => MediaQuery.of(context).size.width >= 900;
-  bool get _isTablet => MediaQuery.of(context).size.width >= 600 && MediaQuery.of(context).size.width < 900;
+  bool get _isTablet =>
+      MediaQuery.of(context).size.width >= 600 &&
+      MediaQuery.of(context).size.width < 900;
 
   @override
   void initState() {
@@ -45,7 +48,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
     final user = authState.user;
 
     // Wait for auth to complete before initializing providers
-    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+    if (!authState.isLoading &&
+        authState.isAuthenticated &&
+        !_hasInitializedProviders) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeProviders();
       });
@@ -53,12 +58,17 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
 
     // Filter buku berdasarkan search dan kategori
     final filteredBooks = alatState.alats.where((book) {
-      final matchesSearch = _searchQuery.isEmpty ||
+      final matchesSearch =
+          _searchQuery.isEmpty ||
           book.namaAlat.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          (book.kategori?.namaKategori.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
-      
-      final matchesKategori = _selectedKategoriId == null || book.kategoriId == _selectedKategoriId;
-      
+          (book.kategori?.namaKategori.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ??
+              false);
+
+      final matchesKategori =
+          _selectedKategoriId == null || book.kategoriId == _selectedKategoriId;
+
       return matchesSearch && matchesKategori;
     }).toList();
 
@@ -74,7 +84,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: _buildAppBar(context, user?.namaLengkap ?? 'Peminjam'),
-      drawer: _isDesktop ? null : PenggunaSidebar(currentRoute: '/peminjam/buku'),
+      drawer: _isDesktop
+          ? null
+          : PenggunaSidebar(currentRoute: '/peminjam/buku'),
       body: Row(
         children: [
           if (_isDesktop)
@@ -90,7 +102,8 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
             ),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => ref.read(alatTersediaProvider.notifier).refresh(),
+              onRefresh: () =>
+                  ref.read(alatTersediaProvider.notifier).refresh(),
               color: AppTheme.primaryColor,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -125,9 +138,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                       ),
                     )
                   else if (filteredBooks.isEmpty)
-                    SliverFillRemaining(
-                      child: _buildEmptyState(),
-                    )
+                    SliverFillRemaining(child: _buildEmptyState())
                   else
                     SliverPadding(
                       padding: EdgeInsets.symmetric(
@@ -141,13 +152,10 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                           crossAxisSpacing: _isDesktop ? 20 : 16,
                           childAspectRatio: 0.68,
                         ),
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final book = filteredBooks[index];
-                            return _buildBookCard(book, index);
-                          },
-                          childCount: filteredBooks.length,
-                        ),
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final book = filteredBooks[index];
+                          return _buildBookCard(book, index);
+                        }, childCount: filteredBooks.length),
                       ),
                     ),
 
@@ -209,6 +217,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -237,7 +246,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                 ),
               ),
             ),
-            if (_isDesktop) ...[ 
+            if (_isDesktop) ...[
               const SizedBox(width: 8),
               Text(
                 userName.split(' ').first,
@@ -266,7 +275,11 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: Colors.grey.shade700,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -278,7 +291,11 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -377,7 +394,11 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           ),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear_rounded, size: 18, color: Colors.grey.shade500),
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    size: 18,
+                    color: Colors.grey.shade500,
+                  ),
                   onPressed: () {
                     setState(() {
                       _searchQuery = '';
@@ -468,14 +489,10 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected
-                ? AppTheme.primaryColor
-                : Colors.white,
+            color: isSelected ? AppTheme.primaryColor : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected
-                  ? AppTheme.primaryColor
-                  : Colors.grey.shade300,
+              color: isSelected ? AppTheme.primaryColor : Colors.grey.shade300,
               width: 1,
             ),
           ),
@@ -546,7 +563,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                 content: const Text('Buku tidak tersedia'),
                 backgroundColor: Colors.orange.shade600,
                 behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 margin: const EdgeInsets.all(16),
               ),
             );
@@ -558,9 +577,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isAvailable
-                  ? Colors.grey.shade200
-                  : Colors.grey.shade300,
+              color: isAvailable ? Colors.grey.shade200 : Colors.grey.shade300,
               width: 1,
             ),
             boxShadow: [
@@ -578,7 +595,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
               Stack(
                 children: [
                   Container(
-                    height: 140,
+                    height: 110,
                     decoration: BoxDecoration(
                       color: Colors.grey.shade100,
                       borderRadius: const BorderRadius.only(
@@ -619,7 +636,10 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: isAvailable
                             ? const Color(0xFF4CAF50)
@@ -665,7 +685,10 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                       // Category
                       if (book.kategori != null)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: AppTheme.primaryColor.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(4),
@@ -751,9 +774,13 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              isAvailable ? Icons.add_circle_outline_rounded : Icons.block_rounded,
+                              isAvailable
+                                  ? Icons.add_circle_outline_rounded
+                                  : Icons.block_rounded,
                               size: 14,
-                              color: isAvailable ? Colors.white : Colors.grey.shade600,
+                              color: isAvailable
+                                  ? Colors.white
+                                  : Colors.grey.shade600,
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -761,7 +788,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: isAvailable ? Colors.white : Colors.grey.shade600,
+                                color: isAvailable
+                                    ? Colors.white
+                                    : Colors.grey.shade600,
                                 letterSpacing: 0.3,
                               ),
                             ),
@@ -811,10 +840,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           const SizedBox(height: 8),
           Text(
             'Coba gunakan kata kunci lain',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
           ),
         ],
       ),

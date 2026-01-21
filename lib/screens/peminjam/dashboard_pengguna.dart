@@ -5,6 +5,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/pengguna_sidebar.dart';
 import '../../providers/peminjaman_provider.dart';
 import '../../providers/alat_provider.dart';
@@ -62,7 +64,9 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
     final user = authState.user;
 
     // Wait for auth to complete before initializing providers
-    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+    if (!authState.isLoading &&
+        authState.isAuthenticated &&
+        !_hasInitializedProviders) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeProviders();
       });
@@ -74,9 +78,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
         key: _scaffoldKey,
         backgroundColor: const Color(0xFFF8F9FA),
         appBar: _buildAppBar(context, 'Loading...'),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -263,6 +265,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -531,7 +534,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
               Text(
                 stat.value,
                 style: const TextStyle(
-                  fontSize: 22,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFF1A1A1A),
                   letterSpacing: -0.5,
@@ -716,26 +719,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          // Navigate to history tab
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('History Peminjaman'),
-              content: SizedBox(
-                width: double.maxFinite,
-                height: 400,
-                child: _buildHistoryDialogContent(peminjamanState),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Tutup'),
-                ),
-              ],
-            ),
-          );
-        },
+        onTap: () => context.go('/peminjam/history'),
         borderRadius: BorderRadius.circular(10),
         child: Container(
           padding: const EdgeInsets.all(16),

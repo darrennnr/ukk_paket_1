@@ -5,6 +5,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/pengguna_sidebar.dart';
 import '../../providers/peminjaman_provider.dart';
 import '../../providers/auth_provider.dart';
@@ -50,7 +52,9 @@ class _HistoryPeminjamanScreenState
     final user = authState.user;
 
     // Wait for auth to complete before initializing providers
-    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+    if (!authState.isLoading &&
+        authState.isAuthenticated &&
+        !_hasInitializedProviders) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeProviders();
       });
@@ -58,13 +62,17 @@ class _HistoryPeminjamanScreenState
 
     // Filter peminjaman berdasarkan search dan status
     final filteredPeminjaman = peminjamanState.peminjamans.where((p) {
-      final matchesSearch = _searchQuery.isEmpty ||
-          (p.alat?.namaAlat.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+      final matchesSearch =
+          _searchQuery.isEmpty ||
+          (p.alat?.namaAlat.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ??
               false) ||
           p.kodePeminjaman.toLowerCase().contains(_searchQuery.toLowerCase());
 
       final matchesStatus =
-          _selectedStatusFilter == null || p.statusPeminjamanId == _selectedStatusFilter;
+          _selectedStatusFilter == null ||
+          p.statusPeminjamanId == _selectedStatusFilter;
 
       return matchesSearch && matchesStatus;
     }).toList();
@@ -76,6 +84,7 @@ class _HistoryPeminjamanScreenState
       return dateB.compareTo(dateA);
     });
 
+    // Statistics
     // Statistics
     final totalPeminjaman = peminjamanState.peminjamans.length;
     final pending = peminjamanState.peminjamans
@@ -92,6 +101,9 @@ class _HistoryPeminjamanScreenState
         .length;
     final terlambat = peminjamanState.peminjamans
         .where((p) => p.statusPeminjamanId == 5)
+        .length;
+    final dibatalkan = peminjamanState.peminjamans
+        .where((p) => p.statusPeminjamanId == 6)
         .length;
 
     return Scaffold(
@@ -116,7 +128,8 @@ class _HistoryPeminjamanScreenState
             ),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => ref.read(myPeminjamanProvider.notifier).refresh(),
+              onRefresh: () =>
+                  ref.read(myPeminjamanProvider.notifier).refresh(),
               color: AppTheme.primaryColor,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -137,6 +150,7 @@ class _HistoryPeminjamanScreenState
                             selesai,
                             ditolak,
                             terlambat,
+                            dibatalkan,
                           ),
                           const SizedBox(height: 20),
                           _buildSearchBar(),
@@ -160,9 +174,7 @@ class _HistoryPeminjamanScreenState
                       ),
                     )
                   else if (filteredPeminjaman.isEmpty)
-                    SliverFillRemaining(
-                      child: _buildEmptyState(),
-                    )
+                    SliverFillRemaining(child: _buildEmptyState())
                   else
                     SliverPadding(
                       padding: EdgeInsets.symmetric(
@@ -170,13 +182,10 @@ class _HistoryPeminjamanScreenState
                         vertical: 0,
                       ),
                       sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final peminjaman = filteredPeminjaman[index];
-                            return _buildHistoryCard(peminjaman, index);
-                          },
-                          childCount: filteredPeminjaman.length,
-                        ),
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final peminjaman = filteredPeminjaman[index];
+                          return _buildHistoryCard(peminjaman, index);
+                        }, childCount: filteredPeminjaman.length),
                       ),
                     ),
 
@@ -238,6 +247,7 @@ class _HistoryPeminjamanScreenState
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -295,7 +305,11 @@ class _HistoryPeminjamanScreenState
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: Colors.grey.shade700,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -307,7 +321,11 @@ class _HistoryPeminjamanScreenState
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -388,6 +406,7 @@ class _HistoryPeminjamanScreenState
     int selesai,
     int ditolak,
     int terlambat,
+    int dibatalkan,
   ) {
     final stats = [
       _StatCard(
@@ -426,6 +445,12 @@ class _HistoryPeminjamanScreenState
         icon: Icons.warning_rounded,
         color: const Color(0xFFDC2626),
       ),
+      _StatCard(
+        title: 'Dibatalkan',
+        value: dibatalkan.toString(),
+        icon: Icons.block_rounded,
+        color: const Color(0xFF9E9E9E),
+      ),
     ];
 
     return LayoutBuilder(
@@ -433,8 +458,8 @@ class _HistoryPeminjamanScreenState
         int crossAxisCount = _isDesktop
             ? 6
             : _isTablet
-                ? 3
-                : 3;
+            ? 3
+            : 3;
 
         return GridView.builder(
           shrinkWrap: true,
@@ -529,8 +554,11 @@ class _HistoryPeminjamanScreenState
           ),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear_rounded,
-                      size: 18, color: Colors.grey.shade500),
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    size: 18,
+                    color: Colors.grey.shade500,
+                  ),
                   onPressed: () {
                     setState(() {
                       _searchQuery = '';
@@ -565,6 +593,11 @@ class _HistoryPeminjamanScreenState
       {'id': 4, 'label': 'Selesai', 'icon': Icons.check_circle_rounded},
       {'id': 3, 'label': 'Ditolak', 'icon': Icons.cancel_rounded},
       {'id': 5, 'label': 'Terlambat', 'icon': Icons.warning_rounded},
+      {
+        'id': 6,
+        'label': 'Dibatalkan',
+        'icon': Icons.block_rounded,
+      }, // TAMBAHAN BARU
     ];
 
     return Column(
@@ -622,9 +655,7 @@ class _HistoryPeminjamanScreenState
             color: isSelected ? AppTheme.primaryColor : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected
-                  ? AppTheme.primaryColor
-                  : Colors.grey.shade300,
+              color: isSelected ? AppTheme.primaryColor : Colors.grey.shade300,
               width: 1,
             ),
           ),
@@ -694,7 +725,8 @@ class _HistoryPeminjamanScreenState
   Widget _buildHistoryCard(PeminjamanModel peminjaman, int index) {
     final statusInfo = _getStatusInfo(peminjaman.statusPeminjamanId ?? 0);
     final bukuNama = peminjaman.alat?.namaAlat ?? 'Buku';
-    final isOverdue = peminjaman.isOverdue &&
+    final isOverdue =
+        peminjaman.isOverdue &&
         (peminjaman.statusPeminjamanId == 2 ||
             peminjaman.statusPeminjamanId == 5);
 
@@ -730,7 +762,8 @@ class _HistoryPeminjamanScreenState
                 Row(
                   children: [
                     // Equipment Photo Thumbnail
-                    if (peminjaman.alat?.fotoAlat != null && peminjaman.alat!.fotoAlat!.isNotEmpty)
+                    if (peminjaman.alat?.fotoAlat != null &&
+                        peminjaman.alat!.fotoAlat!.isNotEmpty)
                       Container(
                         width: 40,
                         height: 40,
@@ -830,8 +863,9 @@ class _HistoryPeminjamanScreenState
                               Icons.calendar_today_outlined,
                               'Tanggal Pinjam',
                               peminjaman.tanggalPinjam != null
-                                  ? DateFormat('dd MMM yyyy')
-                                      .format(peminjaman.tanggalPinjam!)
+                                  ? DateFormat(
+                                      'dd MMM yyyy',
+                                    ).format(peminjaman.tanggalPinjam!)
                                   : '-',
                             ),
                           ),
@@ -839,8 +873,9 @@ class _HistoryPeminjamanScreenState
                             child: _buildDetailItem(
                               Icons.event_outlined,
                               'Jatuh Tempo',
-                              DateFormat('dd MMM yyyy')
-                                  .format(peminjaman.tanggalBerakhir),
+                              DateFormat(
+                                'dd MMM yyyy',
+                              ).format(peminjaman.tanggalBerakhir),
                             ),
                           ),
                           Expanded(
@@ -862,8 +897,9 @@ class _HistoryPeminjamanScreenState
                                   Icons.calendar_today_outlined,
                                   'Tanggal Pinjam',
                                   peminjaman.tanggalPinjam != null
-                                      ? DateFormat('dd MMM yyyy')
-                                          .format(peminjaman.tanggalPinjam!)
+                                      ? DateFormat(
+                                          'dd MMM yyyy',
+                                        ).format(peminjaman.tanggalPinjam!)
                                       : '-',
                                 ),
                               ),
@@ -871,8 +907,9 @@ class _HistoryPeminjamanScreenState
                                 child: _buildDetailItem(
                                   Icons.event_outlined,
                                   'Jatuh Tempo',
-                                  DateFormat('dd MMM yyyy')
-                                      .format(peminjaman.tanggalBerakhir),
+                                  DateFormat(
+                                    'dd MMM yyyy',
+                                  ).format(peminjaman.tanggalBerakhir),
                                 ),
                               ),
                             ],
@@ -943,10 +980,7 @@ class _HistoryPeminjamanScreenState
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 2),
               Text(
@@ -998,10 +1032,7 @@ class _HistoryPeminjamanScreenState
             _searchQuery.isNotEmpty || _selectedStatusFilter != null
                 ? 'Tidak ada hasil yang sesuai dengan filter'
                 : 'Belum ada riwayat peminjaman',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
           ),
         ],
       ),
@@ -1013,7 +1044,8 @@ class _HistoryPeminjamanScreenState
   // ============================================================================
   void _showDetailDialog(PeminjamanModel peminjaman) {
     final statusInfo = _getStatusInfo(peminjaman.statusPeminjamanId ?? 0);
-    final isOverdue = peminjaman.isOverdue &&
+    final isOverdue =
+        peminjaman.isOverdue &&
         (peminjaman.statusPeminjamanId == 2 ||
             peminjaman.statusPeminjamanId == 5);
 
@@ -1080,10 +1112,7 @@ class _HistoryPeminjamanScreenState
               const SizedBox(height: 16),
 
               // Details
-              _buildDialogDetailRow(
-                'Buku',
-                peminjaman.alat?.namaAlat ?? '-',
-              ),
+              _buildDialogDetailRow('Buku', peminjaman.alat?.namaAlat ?? '-'),
               _buildDialogDetailRow(
                 'Kategori',
                 peminjaman.alat?.kategori?.namaKategori ?? '-',
@@ -1095,15 +1124,17 @@ class _HistoryPeminjamanScreenState
               _buildDialogDetailRow(
                 'Tanggal Pengajuan',
                 peminjaman.tanggalPengajuan != null
-                    ? DateFormat('dd MMMM yyyy, HH:mm')
-                        .format(peminjaman.tanggalPengajuan!)
+                    ? DateFormat(
+                        'dd MMMM yyyy, HH:mm',
+                      ).format(peminjaman.tanggalPengajuan!)
                     : '-',
               ),
               _buildDialogDetailRow(
                 'Tanggal Pinjam',
                 peminjaman.tanggalPinjam != null
-                    ? DateFormat('dd MMMM yyyy')
-                        .format(peminjaman.tanggalPinjam!)
+                    ? DateFormat(
+                        'dd MMMM yyyy',
+                      ).format(peminjaman.tanggalPinjam!)
                     : '-',
               ),
               _buildDialogDetailRow(
@@ -1116,10 +1147,7 @@ class _HistoryPeminjamanScreenState
                 valueColor: statusInfo['color'],
               ),
               if (peminjaman.keperluan != null)
-                _buildDialogDetailRow(
-                  'Keperluan',
-                  peminjaman.keperluan!,
-                ),
+                _buildDialogDetailRow('Keperluan', peminjaman.keperluan!),
               if (peminjaman.catatanPetugas != null)
                 _buildDialogDetailRow(
                   'Catatan Petugas',
@@ -1127,65 +1155,44 @@ class _HistoryPeminjamanScreenState
                 ),
 
               // Overdue Warning
-              if (isOverdue) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDC2626).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: const Color(0xFFDC2626).withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.warning_rounded,
-                            color: Color(0xFFDC2626),
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Peringatan Keterlambatan',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFFDC2626),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Terlambat ${peminjaman.daysOverdue} hari',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFDC2626),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Denda: ${_calculateDenda(peminjaman)}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFFDC2626),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-
               const SizedBox(height: 16),
 
-              // Action Button
+              // Tombol Batalkan (hanya untuk status Menunggu atau Dipinjam)
+              if (peminjaman.statusPeminjamanId == 1 ||
+                  peminjaman.statusPeminjamanId == 2)
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => _handleCancelPeminjaman(peminjaman),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFFEF4444)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        icon: const Icon(
+                          Icons.cancel_rounded,
+                          size: 18,
+                          color: Color(0xFFEF4444),
+                        ),
+                        label: const Text(
+                          'Batalkan Peminjaman',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFFEF4444),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+
+              // Tombol Kembalikan Buku (existing code)
               if (peminjaman.statusPeminjamanId == 2 ||
                   peminjaman.statusPeminjamanId == 5)
                 SizedBox(
@@ -1220,8 +1227,11 @@ class _HistoryPeminjamanScreenState
     );
   }
 
-  Widget _buildDialogDetailRow(String label, String value,
-      {Color? valueColor}) {
+  Widget _buildDialogDetailRow(
+    String label,
+    String value, {
+    Color? valueColor,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -1231,10 +1241,7 @@ class _HistoryPeminjamanScreenState
             width: 140,
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
             ),
           ),
           Expanded(
@@ -1250,6 +1257,179 @@ class _HistoryPeminjamanScreenState
         ],
       ),
     );
+  }
+
+  Future<void> _handleCancelPeminjaman(PeminjamanModel peminjaman) async {
+    // Tutup dialog detail terlebih dahulu
+    Navigator.pop(context);
+
+    // Tampilkan konfirmasi
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.warning_rounded,
+                color: Color(0xFFEF4444),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'Konfirmasi Pembatalan',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Apakah Anda yakin ingin membatalkan peminjaman ini?',
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Kode: ${peminjaman.kodePeminjaman}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Buku: ${peminjaman.alat?.namaAlat ?? '-'}',
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Status peminjaman akan berubah menjadi "Dibatalkan" dan stok alat akan dikembalikan.',
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Tidak', style: TextStyle(color: Colors.grey.shade700)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: const Text(
+              'Ya, Batalkan',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    // Tampilkan loading
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final userId = ref.read(currentUserIdProvider);
+      if (userId == null) throw Exception('User tidak ditemukan');
+
+      // Panggil method cancelPeminjaman
+      final success = await ref
+          .read(myPeminjamanProvider.notifier)
+          .cancelPeminjaman(peminjaman.peminjamanId, userId);
+
+      if (!mounted) return;
+      Navigator.pop(context); // Tutup loading dialog
+
+      if (success) {
+        // Tampilkan success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Peminjaman berhasil dibatalkan',
+                    style: const TextStyle(fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFF4CAF50),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        // Refresh data
+        await ref.read(myPeminjamanProvider.notifier).refresh();
+      } else {
+        throw Exception('Gagal membatalkan peminjaman');
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.pop(context); // Tutup loading dialog
+
+      // Tampilkan error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  e.toString().replaceAll('Exception: ', ''),
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: const Color(0xFFEF4444),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   // ============================================================================
@@ -1286,6 +1466,12 @@ class _HistoryPeminjamanScreenState
           'label': 'Terlambat',
           'icon': Icons.warning_rounded,
           'color': const Color(0xFFDC2626),
+        };
+      case 6: // TAMBAHAN BARU
+        return {
+          'label': 'Dibatalkan',
+          'icon': Icons.block_rounded,
+          'color': const Color(0xFF9E9E9E),
         };
       default:
         return {

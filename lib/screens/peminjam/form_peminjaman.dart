@@ -6,6 +6,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/pengguna_sidebar.dart';
 import '../../providers/alat_provider.dart';
 import '../../providers/peminjaman_provider.dart';
@@ -19,7 +21,8 @@ class FormPeminjamanScreen extends ConsumerStatefulWidget {
   const FormPeminjamanScreen({Key? key, this.bookId}) : super(key: key);
 
   @override
-  ConsumerState<FormPeminjamanScreen> createState() => _FormPeminjamanScreenState();
+  ConsumerState<FormPeminjamanScreen> createState() =>
+      _FormPeminjamanScreenState();
 }
 
 class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
@@ -28,9 +31,12 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
 
   // Form fields
   int? _selectedBukuId;
-  final TextEditingController _jumlahController = TextEditingController(text: '1');
+  final TextEditingController _jumlahController = TextEditingController(
+    text: '1',
+  );
   DateTime? _tanggalBerakhir;
   final TextEditingController _keperluanController = TextEditingController();
+  DateTime? _tanggalPengambilan;
 
   bool _isSubmitting = false;
   bool _hasInitializedProviders = false;
@@ -71,7 +77,9 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
     final user = authState.user;
 
     // Wait for auth to complete before initializing providers
-    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+    if (!authState.isLoading &&
+        authState.isAuthenticated &&
+        !_hasInitializedProviders) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeProviders();
       });
@@ -81,7 +89,9 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: _buildAppBar(context, user?.namaLengkap ?? 'Peminjam'),
-      drawer: _isDesktop ? null : PenggunaSidebar(currentRoute: '/peminjam/ajukan'),
+      drawer: _isDesktop
+          ? null
+          : PenggunaSidebar(currentRoute: '/peminjam/ajukan'),
       body: Row(
         children: [
           if (_isDesktop)
@@ -100,7 +110,9 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
               padding: EdgeInsets.all(_isDesktop ? 24 : 16),
               child: Center(
                 child: Container(
-                  constraints: BoxConstraints(maxWidth: _isDesktop ? 700 : double.infinity),
+                  constraints: BoxConstraints(
+                    maxWidth: _isDesktop ? 700 : double.infinity,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -162,6 +174,7 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -219,7 +232,11 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: Colors.grey.shade700,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -231,7 +248,11 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -382,6 +403,12 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
                   _buildJumlahField(alatState.alats),
                   const SizedBox(height: 20),
 
+                  // Tanggal Pengambilan
+                  _buildFieldLabel('Tanggal Pengambilan', isRequired: true),
+                  const SizedBox(height: 8),
+                  _buildDatePickerPengambilan(),
+                  const SizedBox(height: 20),
+
                   // Tanggal Pengembalian
                   _buildFieldLabel('Tanggal Pengembalian', isRequired: true),
                   const SizedBox(height: 8),
@@ -462,7 +489,10 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
         ),
         style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
         dropdownColor: Colors.white,
-        icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey.shade600),
+        icon: Icon(
+          Icons.keyboard_arrow_down_rounded,
+          color: Colors.grey.shade600,
+        ),
         isExpanded: true,
         validator: (value) {
           if (value == null) {
@@ -519,111 +549,116 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
     if (selectedBook.alatId == 0) return const SizedBox.shrink();
 
     return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: AppTheme.primaryColor.withOpacity(0.2),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(6),
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryColor.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: AppTheme.primaryColor.withOpacity(0.2),
+              width: 1,
             ),
-            child: selectedBook.fotoAlat != null && selectedBook.fotoAlat!.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      selectedBook.fotoAlat!,
-                      width: 50,
-                      height: 70,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Icon(
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child:
+                    selectedBook.fotoAlat != null &&
+                        selectedBook.fotoAlat!.isNotEmpty
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.network(
+                          selectedBook.fotoAlat!,
+                          width: 50,
+                          height: 70,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.menu_book_rounded,
+                            size: 28,
+                            color: Colors.grey.shade500,
+                          ),
+                        ),
+                      )
+                    : Icon(
                         Icons.menu_book_rounded,
                         size: 28,
                         color: Colors.grey.shade500,
                       ),
-                    ),
-                  )
-                : Icon(
-                    Icons.menu_book_rounded,
-                    size: 28,
-                    color: Colors.grey.shade500,
-                  ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  selectedBook.namaAlat,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                if (selectedBook.kategori != null)
-                  Text(
-                    selectedBook.kategori!.namaKategori,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                const SizedBox(height: 6),
-                Row(
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.inventory_2_outlined,
-                      size: 12,
-                      color: Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 4),
                     Text(
-                      'Tersedia: ${selectedBook.jumlahTersedia}',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade700,
+                      selectedBook.namaAlat,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1A1A1A),
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(width: 12),
-                    Icon(
-                      Icons.attach_money_rounded,
-                      size: 12,
-                      color: Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      selectedBook.hargaPerhari != null
-                          ? 'Rp ${selectedBook.hargaPerhari!.toStringAsFixed(0)}/hari'
-                          : 'Gratis',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade700,
+                    const SizedBox(height: 4),
+                    if (selectedBook.kategori != null)
+                      Text(
+                        selectedBook.kategori!.namaKategori,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Tersedia: ${selectedBook.jumlahTersedia}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Icon(
+                          Icons.attach_money_rounded,
+                          size: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          selectedBook.hargaPerhari != null
+                              ? 'Rp ${selectedBook.hargaPerhari!.toStringAsFixed(0)}/hari'
+                              : 'Gratis',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 300.ms).scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1));
+        )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .scale(begin: const Offset(0.95, 0.95), end: const Offset(1, 1));
   }
 
   // ============================================================================
@@ -642,7 +677,11 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
             border: Border.all(color: Colors.grey.shade300, width: 1),
           ),
           child: IconButton(
-            icon: Icon(Icons.remove_rounded, size: 18, color: Colors.grey.shade700),
+            icon: Icon(
+              Icons.remove_rounded,
+              size: 18,
+              color: Colors.grey.shade700,
+            ),
             onPressed: () {
               final currentValue = int.tryParse(_jumlahController.text) ?? 1;
               if (currentValue > 1) {
@@ -725,7 +764,11 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
             ),
           ),
           child: IconButton(
-            icon: Icon(Icons.add_rounded, size: 18, color: AppTheme.primaryColor),
+            icon: Icon(
+              Icons.add_rounded,
+              size: 18,
+              color: AppTheme.primaryColor,
+            ),
             onPressed: () {
               if (_selectedBukuId != null) {
                 final book = books.firstWhere(
@@ -760,10 +803,13 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
       color: Colors.transparent,
       child: InkWell(
         onTap: () async {
+          // Tanggal minimal adalah tanggal pengambilan atau hari ini
+          final minDate = _tanggalPengambilan ?? DateTime.now();
+
           final picked = await showDatePicker(
             context: context,
-            initialDate: DateTime.now().add(const Duration(days: 7)),
-            firstDate: DateTime.now(),
+            initialDate: minDate.add(const Duration(days: 1)),
+            firstDate: minDate,
             lastDate: DateTime(DateTime.now().year + 1),
             builder: (context, child) {
               return Theme(
@@ -811,12 +857,106 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
               Expanded(
                 child: Text(
                   _tanggalBerakhir != null
-                      ? DateFormat('dd MMMM yyyy', 'id_ID').format(_tanggalBerakhir!)
+                      ? DateFormat(
+                          'dd MMMM yyyy',
+                          'id_ID',
+                        ).format(_tanggalBerakhir!)
                       : 'Pilih tanggal pengembalian',
                   style: TextStyle(
                     fontSize: 13,
-                    fontWeight: _tanggalBerakhir != null ? FontWeight.w500 : FontWeight.w400,
+                    fontWeight: _tanggalBerakhir != null
+                        ? FontWeight.w500
+                        : FontWeight.w400,
                     color: _tanggalBerakhir != null
+                        ? const Color(0xFF1A1A1A)
+                        : Colors.grey.shade500,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.arrow_drop_down_rounded,
+                size: 20,
+                color: Colors.grey.shade600,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDatePickerPengambilan() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () async {
+          final picked = await showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime.now(),
+            lastDate: DateTime(DateTime.now().year + 1),
+            builder: (context, child) {
+              return Theme(
+                data: Theme.of(context).copyWith(
+                  colorScheme: ColorScheme.light(
+                    primary: AppTheme.primaryColor,
+                    onPrimary: Colors.white,
+                    surface: Colors.white,
+                    onSurface: Colors.black,
+                  ),
+                ),
+                child: child!,
+              );
+            },
+          );
+          if (picked != null) {
+            setState(() {
+              _tanggalPengambilan = picked;
+              // Reset tanggal berakhir jika lebih awal dari tanggal pengambilan
+              if (_tanggalBerakhir != null &&
+                  _tanggalBerakhir!.isBefore(picked)) {
+                _tanggalBerakhir = null;
+              }
+            });
+          }
+        },
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: _tanggalPengambilan != null
+                  ? AppTheme.primaryColor.withOpacity(0.3)
+                  : Colors.grey.shade300,
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.event_available_outlined,
+                size: 18,
+                color: _tanggalPengambilan != null
+                    ? AppTheme.primaryColor
+                    : Colors.grey.shade600,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  _tanggalPengambilan != null
+                      ? DateFormat(
+                          'dd MMMM yyyy',
+                          'id_ID',
+                        ).format(_tanggalPengambilan!)
+                      : 'Pilih tanggal pengambilan',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: _tanggalPengambilan != null
+                        ? FontWeight.w500
+                        : FontWeight.w400,
+                    color: _tanggalPengambilan != null
                         ? const Color(0xFF1A1A1A)
                         : Colors.grey.shade500,
                   ),
@@ -898,7 +1038,9 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.grey.shade600),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.grey.shade600,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -939,8 +1081,21 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
       return;
     }
 
+    if (_tanggalPengambilan == null) {
+      _showErrorSnackbar('Harap pilih tanggal pengambilan');
+      return;
+    }
+
     if (_tanggalBerakhir == null) {
       _showErrorSnackbar('Harap pilih tanggal pengembalian');
+      return;
+    }
+
+    // Validasi tanggal pengembalian harus setelah tanggal pengambilan
+    if (_tanggalBerakhir!.isBefore(_tanggalPengambilan!)) {
+      _showErrorSnackbar(
+        'Tanggal pengembalian harus setelah tanggal pengambilan',
+      );
       return;
     }
 
@@ -964,8 +1119,10 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
         alatId: _selectedBukuId!,
         kodePeminjaman: kode,
         jumlahPinjam: int.parse(_jumlahController.text),
+        tanggalPinjam: _tanggalPengambilan!, // TAMBAH INI
         tanggalBerakhir: _tanggalBerakhir!,
         keperluan: _keperluanController.text.trim(),
+        statusPeminjamanId: 1, // TAMBAH INI - Status Pending
       );
 
       final success = await ref
@@ -1050,10 +1207,7 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
                 ),
                 child: const Text(
                   'Kembali ke Dashboard',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -1071,10 +1225,7 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
             Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
             const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(fontSize: 13),
-              ),
+              child: Text(message, style: const TextStyle(fontSize: 13)),
             ),
           ],
         ),

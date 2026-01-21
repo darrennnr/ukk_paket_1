@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart' hide AppTheme;
 import 'package:paket_3_training/widgets/petugas_sidebar.dart';
 import 'package:paket_3_training/providers/pengembalian_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
@@ -150,6 +151,7 @@ class _PetugasPengembalianManagementState
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(

@@ -5,6 +5,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/pengguna_sidebar.dart';
 import '../../providers/peminjaman_provider.dart';
 import '../../providers/pengembalian_provider.dart';
@@ -49,7 +51,9 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
     final user = authState.user;
 
     // Wait for auth to complete before initializing providers
-    if (!authState.isLoading && authState.isAuthenticated && !_hasInitializedProviders) {
+    if (!authState.isLoading &&
+        authState.isAuthenticated &&
+        !_hasInitializedProviders) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeProviders();
       });
@@ -57,10 +61,12 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
 
     // Filter hanya peminjaman yang sedang dipinjam (status 2 atau 5)
     final activePeminjaman = peminjamanState.peminjamans.where((p) {
-      final isActive =
-          p.statusPeminjamanId == 2 || p.statusPeminjamanId == 5;
-      final matchesSearch = _searchQuery.isEmpty ||
-          (p.alat?.namaAlat.toLowerCase().contains(_searchQuery.toLowerCase()) ??
+      final isActive = p.statusPeminjamanId == 2 || p.statusPeminjamanId == 5;
+      final matchesSearch =
+          _searchQuery.isEmpty ||
+          (p.alat?.namaAlat.toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ??
               false) ||
           p.kodePeminjaman.toLowerCase().contains(_searchQuery.toLowerCase());
 
@@ -107,7 +113,8 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
             ),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => ref.read(myPeminjamanProvider.notifier).refresh(),
+              onRefresh: () =>
+                  ref.read(myPeminjamanProvider.notifier).refresh(),
               color: AppTheme.primaryColor,
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -121,10 +128,15 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                         children: [
                           _buildPageHeader(),
                           const SizedBox(height: 20),
-                          _buildStatisticsGrid(totalAktif, terlambat, totalDenda),
+                          _buildStatisticsGrid(
+                            totalAktif,
+                            terlambat,
+                            totalDenda,
+                          ),
                           const SizedBox(height: 20),
                           if (activePeminjaman.isNotEmpty) _buildSearchBar(),
-                          if (activePeminjaman.isNotEmpty) const SizedBox(height: 20),
+                          if (activePeminjaman.isNotEmpty)
+                            const SizedBox(height: 20),
                           if (activePeminjaman.isNotEmpty)
                             _buildResultsHeader(activePeminjaman.length),
                         ],
@@ -143,9 +155,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                       ),
                     )
                   else if (activePeminjaman.isEmpty)
-                    SliverFillRemaining(
-                      child: _buildEmptyState(),
-                    )
+                    SliverFillRemaining(child: _buildEmptyState())
                   else
                     SliverPadding(
                       padding: EdgeInsets.symmetric(
@@ -153,13 +163,10 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                         vertical: 0,
                       ),
                       sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final peminjaman = activePeminjaman[index];
-                            return _buildBookCard(peminjaman, index);
-                          },
-                          childCount: activePeminjaman.length,
-                        ),
+                        delegate: SliverChildBuilderDelegate((context, index) {
+                          final peminjaman = activePeminjaman[index];
+                          return _buildBookCard(peminjaman, index);
+                        }, childCount: activePeminjaman.length),
                       ),
                     ),
 
@@ -221,6 +228,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -278,7 +286,11 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: Colors.grey.shade700,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -290,7 +302,11 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -364,7 +380,11 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
   // ============================================================================
   // STATISTICS GRID
   // ============================================================================
-  Widget _buildStatisticsGrid(int totalAktif, int terlambat, double totalDenda) {
+  Widget _buildStatisticsGrid(
+    int totalAktif,
+    int terlambat,
+    double totalDenda,
+  ) {
     final stats = [
       _StatCard(
         title: 'Sedang Dipinjam',
@@ -424,7 +444,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
               color: stat.color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(7),
             ),
-            child: Icon(stat.icon, color: stat.color, size: 18),
+            child: Icon(stat.icon, color: stat.color, size: 16),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -435,7 +455,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                 child: Text(
                   stat.value,
                   style: TextStyle(
-                    fontSize: _isDesktop ? 20 : 16,
+                    fontSize: _isDesktop ? 18 : 14,
                     fontWeight: FontWeight.w700,
                     color: const Color(0xFF1A1A1A),
                     letterSpacing: -0.5,
@@ -446,7 +466,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
               Text(
                 stat.title,
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: FontWeight.w500,
                   color: Colors.grey.shade600,
                   letterSpacing: 0.1,
@@ -487,8 +507,11 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           ),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
-                  icon: Icon(Icons.clear_rounded,
-                      size: 18, color: Colors.grey.shade500),
+                  icon: Icon(
+                    Icons.clear_rounded,
+                    size: 18,
+                    color: Colors.grey.shade500,
+                  ),
                   onPressed: () {
                     setState(() {
                       _searchQuery = '';
@@ -585,7 +608,8 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
             Row(
               children: [
                 // Equipment Photo Thumbnail
-                if (peminjaman.alat?.fotoAlat != null && peminjaman.alat!.fotoAlat!.isNotEmpty)
+                if (peminjaman.alat?.fotoAlat != null &&
+                    peminjaman.alat!.fotoAlat!.isNotEmpty)
                   Container(
                     width: 40,
                     height: 40,
@@ -690,8 +714,9 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                           Icons.calendar_today_outlined,
                           'Tanggal Pinjam',
                           peminjaman.tanggalPinjam != null
-                              ? DateFormat('dd MMM yyyy')
-                                  .format(peminjaman.tanggalPinjam!)
+                              ? DateFormat(
+                                  'dd MMM yyyy',
+                                ).format(peminjaman.tanggalPinjam!)
                               : '-',
                         ),
                       ),
@@ -699,8 +724,9 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                         child: _buildDetailItem(
                           Icons.event_outlined,
                           'Jatuh Tempo',
-                          DateFormat('dd MMM yyyy')
-                              .format(peminjaman.tanggalBerakhir),
+                          DateFormat(
+                            'dd MMM yyyy',
+                          ).format(peminjaman.tanggalBerakhir),
                         ),
                       ),
                       Expanded(
@@ -722,8 +748,9 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                               Icons.calendar_today_outlined,
                               'Tanggal Pinjam',
                               peminjaman.tanggalPinjam != null
-                                  ? DateFormat('dd MMM yyyy')
-                                      .format(peminjaman.tanggalPinjam!)
+                                  ? DateFormat(
+                                      'dd MMM yyyy',
+                                    ).format(peminjaman.tanggalPinjam!)
                                   : '-',
                             ),
                           ),
@@ -731,8 +758,9 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                             child: _buildDetailItem(
                               Icons.event_outlined,
                               'Jatuh Tempo',
-                              DateFormat('dd MMM yyyy')
-                                  .format(peminjaman.tanggalBerakhir),
+                              DateFormat(
+                                'dd MMM yyyy',
+                              ).format(peminjaman.tanggalBerakhir),
                             ),
                           ),
                         ],
@@ -889,10 +917,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                 icon: const Icon(Icons.assignment_return_rounded, size: 18),
                 label: const Text(
                   'Kembalikan Buku',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -913,10 +938,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 2),
               Text(
@@ -966,10 +988,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           const SizedBox(height: 8),
           Text(
             'Semua buku sudah dikembalikan',
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
@@ -980,17 +999,19 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             ),
-            icon: const Icon(Icons.menu_book_rounded, size: 18),
+            icon: const Icon(
+              Icons.menu_book_rounded,
+              size: 18,
+              color: Colors.white,
+            ),
             label: const Text(
               'Lihat Daftar Buku',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
+                color: Colors.white,
               ),
             ),
           ),
@@ -1012,7 +1033,9 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           contentPadding: const EdgeInsets.all(20),
           content: SizedBox(
             width: _isDesktop ? 500 : double.maxFinite,
@@ -1216,13 +1239,18 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                           color: Colors.grey.shade600,
                         ),
                       ),
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color(0xFF1A1A1A),
+                      ),
                       dropdownColor: Colors.white,
                       items: ['Baik', 'Rusak Ringan', 'Rusak Berat']
-                          .map((kondisi) => DropdownMenuItem(
-                                value: kondisi,
-                                child: Text(kondisi),
-                              ))
+                          .map(
+                            (kondisi) => DropdownMenuItem(
+                              value: kondisi,
+                              child: Text(kondisi),
+                            ),
+                          )
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -1330,7 +1358,11 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
     );
   }
 
-  Widget _buildPaymentRow(String label, String value, {bool isHighlight = false}) {
+  Widget _buildPaymentRow(
+    String label,
+    String value, {
+    bool isHighlight = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -1338,9 +1370,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isHighlight
-                ? const Color(0xFFDC2626)
-                : Colors.grey.shade700,
+            color: isHighlight ? const Color(0xFFDC2626) : Colors.grey.shade700,
           ),
         ),
         Text(
@@ -1398,7 +1428,9 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
 
     try {
       // Process return
-      final success = await ref.read(pengembalianProvider.notifier).prosesPengembalian(
+      final success = await ref
+          .read(pengembalianProvider.notifier)
+          .prosesPengembalian(
             peminjamanId: peminjaman.peminjamanId,
             petugasId: userId, // User acts as their own processor
             kondisiAlat: kondisi,
@@ -1421,20 +1453,28 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.check_circle_rounded,
-                      color: Colors.white, size: 20),
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   const SizedBox(width: 12),
                   const Expanded(
                     child: Text(
                       'Buku berhasil dikembalikan',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
               backgroundColor: const Color(0xFF4CAF50),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               margin: const EdgeInsets.all(16),
             ),
           );
@@ -1446,20 +1486,29 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
             SnackBar(
               content: Row(
                 children: [
-                  const Icon(Icons.error_rounded, color: Colors.white, size: 20),
+                  const Icon(
+                    Icons.error_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       ref.read(pengembalianProvider).errorMessage ??
                           'Gagal mengembalikan buku',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
               ),
               backgroundColor: const Color(0xFFEF4444),
               behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
               margin: const EdgeInsets.all(16),
             ),
           );
@@ -1480,14 +1529,19 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                 Expanded(
                   child: Text(
                     'Terjadi kesalahan: ${e.toString()}',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
             margin: const EdgeInsets.all(16),
           ),
         );

@@ -583,6 +583,7 @@ class _KategoriManagementState extends ConsumerState<KategoriManagement> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
+                        color : Colors.black
                       ),
                     ),
                   ),
@@ -628,6 +629,7 @@ class _KategoriManagementState extends ConsumerState<KategoriManagement> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                   ),

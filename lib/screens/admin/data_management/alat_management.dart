@@ -903,6 +903,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
+                          color : Colors.white,
                         ),
                       ),
                     ),
@@ -1012,6 +1013,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -1057,6 +1059,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -1311,6 +1314,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -1539,7 +1543,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                     TextButton.icon(
                       onPressed: _clearImage,
                       icon: const Icon(Icons.close_rounded, size: 16),
-                      label: const Text('Hapus'),
+                      label: const Text('Hapus',),
                       style: TextButton.styleFrom(
                         foregroundColor: const Color(0xFFFF5252),
                         textStyle: const TextStyle(fontSize: 12),

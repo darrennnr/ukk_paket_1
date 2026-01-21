@@ -440,7 +440,7 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
             backgroundColor: AppTheme.primaryColor,
             foregroundColor: AppColors.surface,
             elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -1159,6 +1159,7 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: Colors.white,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: _isDesktop ? 500 : double.infinity,

@@ -5,7 +5,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
-import 'package:paket_3_training/core/design_system/app_design_system.dart' hide AppTheme;
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/petugas_sidebar.dart';
 import 'package:paket_3_training/providers/pengembalian_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
@@ -66,7 +67,9 @@ class _PetugasPengembalianManagementState
       key: _scaffoldKey,
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: _buildAppBar(),
-      drawer: _isDesktop ? null : const PetugasSidebar(currentRoute: '/petugas/pengembalian'),
+      drawer: _isDesktop
+          ? null
+          : const PetugasSidebar(currentRoute: '/petugas/pengembalian'),
       body: Row(
         children: [
           // Desktop Sidebar
@@ -79,7 +82,9 @@ class _PetugasPengembalianManagementState
                   right: BorderSide(color: Colors.grey.shade200, width: 1),
                 ),
               ),
-              child: const PetugasSidebar(currentRoute: '/petugas/pengembalian'),
+              child: const PetugasSidebar(
+                currentRoute: '/petugas/pengembalian',
+              ),
             ),
 
           // Main Content
@@ -110,7 +115,7 @@ class _PetugasPengembalianManagementState
   PreferredSizeWidget _buildAppBar() {
     final user = ref.watch(authProvider).user;
     final userName = user?.namaLengkap ?? 'Petugas';
-    
+
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.white,
@@ -151,7 +156,7 @@ class _PetugasPengembalianManagementState
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            color: AppColors.surface,
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -209,7 +214,11 @@ class _PetugasPengembalianManagementState
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: Colors.grey.shade700,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -221,7 +230,11 @@ class _PetugasPengembalianManagementState
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -302,8 +315,8 @@ class _PetugasPengembalianManagementState
   Widget _buildCountBadge(int count, bool isActive, {bool isAlert = false}) {
     final bgColor = isAlert
         ? (isActive
-            ? const Color(0xFFFF5252)
-            : const Color(0xFFFF5252).withOpacity(0.2))
+              ? const Color(0xFFFF5252)
+              : const Color(0xFFFF5252).withOpacity(0.2))
         : (isActive ? AppTheme.primaryColor : Colors.grey.shade300);
 
     final textColor = isAlert
@@ -415,7 +428,10 @@ class _PetugasPengembalianManagementState
             if (_isMobile) const Spacer(),
             if (_isMobile)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(6),
@@ -423,7 +439,11 @@ class _PetugasPengembalianManagementState
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.visibility_outlined, size: 12, color: Colors.grey.shade600),
+                    Icon(
+                      Icons.visibility_outlined,
+                      size: 12,
+                      color: Colors.grey.shade600,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       'Read-Only',
@@ -499,14 +519,14 @@ class _PetugasPengembalianManagementState
                 setState(() => _searchQuery = value.toLowerCase()),
           ),
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Filter Row
         _isDesktop || _isTablet
             ? _buildDesktopFilterRow()
             : _buildMobileFilterColumn(),
-        
+
         // Clear Filters Button
         if (_hasActiveFilters())
           Padding(
@@ -515,13 +535,20 @@ class _PetugasPengembalianManagementState
               alignment: Alignment.centerRight,
               child: TextButton.icon(
                 onPressed: _clearAllFilters,
-                icon: Icon(Icons.clear_all, size: 14, color: Colors.grey.shade600),
+                icon: Icon(
+                  Icons.clear_all,
+                  size: 14,
+                  color: Colors.grey.shade600,
+                ),
                 label: Text(
                   'Hapus Semua Filter',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
                 style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                 ),
               ),
             ),
@@ -545,9 +572,9 @@ class _PetugasPengembalianManagementState
           onChanged: (value) => setState(() => _selectedPaymentStatus = value),
           width: 180,
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // Kondisi Buku
         _buildFilterDropdown(
           value: _selectedCondition,
@@ -561,9 +588,9 @@ class _PetugasPengembalianManagementState
           onChanged: (value) => setState(() => _selectedCondition = value),
           width: 160,
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // Tanggal Mulai
         _buildDateFilter(
           value: _selectedStartDate,
@@ -571,9 +598,9 @@ class _PetugasPengembalianManagementState
           onChanged: (date) => setState(() => _selectedStartDate = date),
           width: 160,
         ),
-        
+
         const SizedBox(width: 12),
-        
+
         // Tanggal Akhir
         _buildDateFilter(
           value: _selectedEndDate,
@@ -598,9 +625,13 @@ class _PetugasPengembalianManagementState
                 items: const [
                   DropdownMenuItem(value: null, child: Text('Semua')),
                   DropdownMenuItem(value: 'lunas', child: Text('Lunas')),
-                  DropdownMenuItem(value: 'belum lunas', child: Text('Belum Lunas')),
+                  DropdownMenuItem(
+                    value: 'belum lunas',
+                    child: Text('Belum Lunas'),
+                  ),
                 ],
-                onChanged: (value) => setState(() => _selectedPaymentStatus = value),
+                onChanged: (value) =>
+                    setState(() => _selectedPaymentStatus = value),
               ),
             ),
             const SizedBox(width: 12),
@@ -614,14 +645,15 @@ class _PetugasPengembalianManagementState
                   DropdownMenuItem(value: 'rusak', child: Text('Rusak')),
                   DropdownMenuItem(value: 'hilang', child: Text('Hilang')),
                 ],
-                onChanged: (value) => setState(() => _selectedCondition = value),
+                onChanged: (value) =>
+                    setState(() => _selectedCondition = value),
               ),
             ),
           ],
         ),
-        
+
         const SizedBox(height: 12),
-        
+
         // Row 2
         Row(
           children: [
@@ -723,22 +755,29 @@ class _PetugasPengembalianManagementState
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  value != null
-                      ? DateFormat('dd/MM/yyyy').format(value)
-                      : hint,
+                  value != null ? DateFormat('dd/MM/yyyy').format(value) : hint,
                   style: TextStyle(
                     fontSize: 13,
-                    color: value != null ? const Color(0xFF1A1A1A) : Colors.grey.shade600,
+                    color: value != null
+                        ? const Color(0xFF1A1A1A)
+                        : Colors.grey.shade600,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               if (value != null)
                 IconButton(
-                  icon: Icon(Icons.clear, size: 16, color: Colors.grey.shade500),
+                  icon: Icon(
+                    Icons.clear,
+                    size: 16,
+                    color: Colors.grey.shade500,
+                  ),
                   onPressed: () => onChanged(null),
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+                  constraints: const BoxConstraints(
+                    minWidth: 24,
+                    minHeight: 24,
+                  ),
                 ),
             ],
           ),
@@ -773,7 +812,8 @@ class _PetugasPengembalianManagementState
       final nama = item.peminjaman?.peminjam?.namaLengkap.toLowerCase() ?? '';
       final alat = item.peminjaman?.alat?.namaAlat.toLowerCase() ?? '';
 
-      final matchesSearch = _searchQuery.isEmpty ||
+      final matchesSearch =
+          _searchQuery.isEmpty ||
           kode.contains(_searchQuery) ||
           nama.contains(_searchQuery) ||
           alat.contains(_searchQuery);
@@ -795,7 +835,8 @@ class _PetugasPengembalianManagementState
       // 4. Filter Tanggal
       bool matchesDate = true;
       if (_selectedStartDate != null) {
-        matchesDate = item.tanggalKembali != null &&
+        matchesDate =
+            item.tanggalKembali != null &&
             item.tanggalKembali!.isAfter(
               DateTime(
                 _selectedStartDate!.year,
@@ -805,7 +846,8 @@ class _PetugasPengembalianManagementState
             );
       }
       if (_selectedEndDate != null) {
-        matchesDate = matchesDate &&
+        matchesDate =
+            matchesDate &&
             item.tanggalKembali != null &&
             item.tanggalKembali!.isBefore(
               DateTime(
@@ -976,7 +1018,8 @@ class _PetugasPengembalianManagementState
               flex: 2,
               child: Row(
                 children: [
-                  if (item.peminjaman?.alat?.fotoAlat != null && item.peminjaman!.alat!.fotoAlat!.isNotEmpty)
+                  if (item.peminjaman?.alat?.fotoAlat != null &&
+                      item.peminjaman!.alat!.fotoAlat!.isNotEmpty)
                     Container(
                       width: 32,
                       height: 32,
@@ -1003,7 +1046,10 @@ class _PetugasPengembalianManagementState
                   Expanded(
                     child: Text(
                       item.peminjaman?.alat?.namaAlat ?? '-',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF1A1A1A)),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF1A1A1A),
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1100,152 +1146,171 @@ class _PetugasPengembalianManagementState
     );
 
     return InkWell(
-      onTap: () => _showDetailDialog(item),
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
+          onTap: () => _showDetailDialog(item),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.grey.shade200, width: 1),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Top Row: Kode & Status
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.grey.shade200, width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Text(
-                    item.peminjaman?.kodePeminjaman ?? '-',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A1A),
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _buildPaymentStatusBadge(item.statusPembayaran),
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Middle: Info
-            _buildInfoRow(
-              Icons.person_outline_rounded,
-              'Peminjam',
-              item.peminjaman?.peminjam?.namaLengkap ?? '-',
-            ),
-            const SizedBox(height: 8),
-            _buildInfoRow(
-              Icons.menu_book_rounded,
-              'Judul Buku',
-              item.peminjaman?.alat?.namaAlat ?? '-',
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.event_available_outlined, size: 14, color: Colors.grey.shade500),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Dikembalikan',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade700,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.tanggalKembali != null
-                            ? DateFormat('dd MMM yyyy').format(item.tanggalKembali!)
-                            : '-',
+                // Top Row: Kode & Status
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.peminjaman?.kodePeminjaman ?? '-',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF1A1A1A),
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      if (item.isLate)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            'Telat ${item.keterlambatanHari} hari',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: Color(0xFFFF5252),
-                              fontWeight: FontWeight.w600,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPaymentStatusBadge(item.statusPembayaran),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                // Middle: Info
+                _buildInfoRow(
+                  Icons.person_outline_rounded,
+                  'Peminjam',
+                  item.peminjaman?.peminjam?.namaLengkap ?? '-',
+                ),
+                const SizedBox(height: 8),
+                _buildInfoRow(
+                  Icons.menu_book_rounded,
+                  'Judul Buku',
+                  item.peminjaman?.alat?.namaAlat ?? '-',
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.event_available_outlined,
+                      size: 14,
+                      color: Colors.grey.shade500,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Dikembalikan',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey.shade700,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            _buildInfoRow(
-              Icons.assignment_turned_in_rounded,
-              'Kondisi',
-              item.kondisiAlat?.toUpperCase() ?? '-',
-            ),
-
-            Divider(height: 20, color: Colors.grey.shade100),
-
-            // Bottom: Financials & View
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Total Tagihan',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: Colors.grey.shade600,
-                        ),
+                          const SizedBox(height: 2),
+                          Text(
+                            item.tanggalKembali != null
+                                ? DateFormat(
+                                    'dd MMM yyyy',
+                                  ).format(item.tanggalKembali!)
+                                : '-',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1A1A1A),
+                            ),
+                          ),
+                          if (item.isLate)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(
+                                'Telat ${item.keterlambatanHari} hari',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Color(0xFFFF5252),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        (item.totalPembayaran ?? 0) > 0
-                            ? currencyFormat.format(item.totalPembayaran)
-                            : 'Gratis',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF1A1A1A),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                OutlinedButton.icon(
-                  onPressed: () => _showDetailDialog(item),
-                  icon: Icon(Icons.visibility_outlined, size: 14),
-                  label: const Text('Lihat'),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    side: BorderSide(color: Colors.grey.shade300),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
                     ),
-                  ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                _buildInfoRow(
+                  Icons.assignment_turned_in_rounded,
+                  'Kondisi',
+                  item.kondisiAlat?.toUpperCase() ?? '-',
+                ),
+
+                Divider(height: 20, color: Colors.grey.shade100),
+
+                // Bottom: Financials & View
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Total Tagihan',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            (item.totalPembayaran ?? 0) > 0
+                                ? currencyFormat.format(item.totalPembayaran)
+                                : 'Gratis',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1A1A1A),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () => _showDetailDialog(item),
+                      icon: Icon(
+                        Icons.visibility_outlined,
+                        size: 14,
+                        color: AppTheme.primaryColor,
+                      ),
+                      label: Text(
+                        'Lihat',
+                        style: TextStyle(color: AppTheme.primaryColor),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 50).ms).scale(begin: const Offset(0.95, 0.95));
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .scale(begin: const Offset(0.95, 0.95));
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {
@@ -1369,6 +1434,7 @@ class _PetugasPengembalianManagementState
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor :  Colors.white,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: _isDesktop ? 500 : double.infinity,
@@ -1439,10 +1505,7 @@ class _PetugasPengembalianManagementState
                   'Kondisi Buku',
                   item.kondisiAlat?.toUpperCase() ?? '-',
                 ),
-                _buildDetailRow(
-                  'Jumlah Kembali',
-                  '${item.jumlahKembali} buku',
-                ),
+                _buildDetailRow('Jumlah Kembali', '${item.jumlahKembali} buku'),
                 _buildDetailRow(
                   'Tgl Kembali',
                   item.tanggalKembali != null
@@ -1451,10 +1514,7 @@ class _PetugasPengembalianManagementState
                         ).format(item.tanggalKembali!)
                       : '-',
                 ),
-                _buildDetailRow(
-                  'Petugas',
-                  item.petugas?.namaLengkap ?? '-',
-                ),
+                _buildDetailRow('Petugas', item.petugas?.namaLengkap ?? '-'),
 
                 if (item.catatan != null && item.catatan!.isNotEmpty)
                   _buildDetailRow('Catatan', item.catatan!),
@@ -1634,12 +1694,12 @@ class _PetugasPengembalianManagementState
 
   Widget _buildLoadingSkeleton() {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      height: 400,
-    )
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          height: 400,
+        )
         .animate(onPlay: (controller) => controller.repeat())
         .shimmer(duration: 1200.ms);
   }

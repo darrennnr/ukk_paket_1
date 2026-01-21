@@ -5,7 +5,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:paket_3_training/core/design_system/app_color.dart';
-import 'package:paket_3_training/core/design_system/app_design_system.dart' hide AppTheme;
+import 'package:paket_3_training/core/design_system/app_design_system.dart'
+    hide AppTheme;
 import 'package:paket_3_training/widgets/petugas_sidebar.dart';
 import 'package:paket_3_training/providers/peminjaman_provider.dart';
 import 'package:paket_3_training/providers/auth_provider.dart';
@@ -100,7 +101,7 @@ class _PetugasPeminjamanManagementState
   PreferredSizeWidget _buildAppBar() {
     final user = ref.watch(authProvider).user;
     final userName = user?.namaLengkap ?? 'Petugas';
-    
+
     return AppBar(
       elevation: 0,
       backgroundColor: Colors.white,
@@ -141,7 +142,7 @@ class _PetugasPeminjamanManagementState
     return PopupMenuButton<String>(
       offset: const Offset(0, 45),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            color: AppColors.surface,
+      color: AppColors.surface,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
@@ -199,7 +200,11 @@ class _PetugasPeminjamanManagementState
           height: 40,
           child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 18, color: Colors.grey.shade700),
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: Colors.grey.shade700,
+              ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
             ],
@@ -211,7 +216,11 @@ class _PetugasPeminjamanManagementState
           height: 40,
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 18, color: Color(0xFFFF5252)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 18,
+                color: Color(0xFFFF5252),
+              ),
               const SizedBox(width: 10),
               const Text(
                 'Keluar',
@@ -281,14 +290,10 @@ class _PetugasPeminjamanManagementState
           if (_isDesktop || _isTablet) const SizedBox(height: 12),
           if (_isDesktop || _isTablet)
             Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: _isDesktop ? 24 : 16,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: _isDesktop ? 24 : 16),
               child: Row(
                 children: [
-                  Expanded(
-                    child: _buildSearchField(),
-                  ),
+                  Expanded(child: _buildSearchField()),
                   const SizedBox(width: 12),
                   _buildStatusFilter(),
                 ],
@@ -698,10 +703,7 @@ class _PetugasPeminjamanManagementState
                   const SizedBox(height: 2),
                   Text(
                     'Qty: ${peminjaman.jumlahPinjam}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   ),
                 ],
               ),
@@ -711,10 +713,7 @@ class _PetugasPeminjamanManagementState
               flex: 2,
               child: Text(
                 peminjaman.peminjam?.namaLengkap ?? '-',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF1A1A1A),
-                ),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF1A1A1A)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -724,7 +723,8 @@ class _PetugasPeminjamanManagementState
               flex: 2,
               child: Row(
                 children: [
-                  if (peminjaman.alat?.fotoAlat != null && peminjaman.alat!.fotoAlat!.isNotEmpty)
+                  if (peminjaman.alat?.fotoAlat != null &&
+                      peminjaman.alat!.fotoAlat!.isNotEmpty)
                     Container(
                       width: 32,
                       height: 32,
@@ -770,8 +770,9 @@ class _PetugasPeminjamanManagementState
                 children: [
                   Text(
                     peminjaman.tanggalPinjam != null
-                        ? DateFormat('dd MMM yyyy')
-                            .format(peminjaman.tanggalPinjam!)
+                        ? DateFormat(
+                            'dd MMM yyyy',
+                          ).format(peminjaman.tanggalPinjam!)
                         : '-',
                     style: const TextStyle(
                       fontSize: 12,
@@ -781,10 +782,7 @@ class _PetugasPeminjamanManagementState
                   const SizedBox(height: 2),
                   Text(
                     'Sampai: ${DateFormat('dd MMM yyyy').format(peminjaman.tanggalBerakhir)}',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                   ),
                 ],
               ),
@@ -1073,6 +1071,7 @@ class _PetugasPeminjamanManagementState
       context: context,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: Colors.white,
         child: ConstrainedBox(
           constraints: BoxConstraints(
             maxWidth: _isDesktop ? 500 : double.infinity,
@@ -1130,14 +1129,17 @@ class _PetugasPeminjamanManagementState
                 _buildDetailRow(
                   'Tanggal Pengajuan',
                   peminjaman.tanggalPengajuan != null
-                      ? DateFormat('dd MMMM yyyy, HH:mm')
-                          .format(peminjaman.tanggalPengajuan!)
+                      ? DateFormat(
+                          'dd MMMM yyyy, HH:mm',
+                        ).format(peminjaman.tanggalPengajuan!)
                       : '-',
                 ),
                 _buildDetailRow(
                   'Tanggal Pinjam',
                   peminjaman.tanggalPinjam != null
-                      ? DateFormat('dd MMMM yyyy').format(peminjaman.tanggalPinjam!)
+                      ? DateFormat(
+                          'dd MMMM yyyy',
+                        ).format(peminjaman.tanggalPinjam!)
                       : '-',
                 ),
                 _buildDetailRow(
@@ -1209,6 +1211,7 @@ class _PetugasPeminjamanManagementState
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                   ),

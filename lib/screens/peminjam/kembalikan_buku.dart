@@ -914,10 +914,18 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                icon: const Icon(Icons.assignment_return_rounded, size: 18),
+                icon: const Icon(
+                  Icons.assignment_return_rounded,
+                  size: 18,
+                  color: Colors.white,
+                ),
                 label: const Text(
                   'Kembalikan Buku',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -1036,6 +1044,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+          backgroundColor: Colors.white,
           contentPadding: const EdgeInsets.all(20),
           content: SizedBox(
             width: _isDesktop ? 500 : double.maxFinite,
@@ -1343,6 +1352,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
+                              color: Colors.white,
                             ),
                           ),
                         ),

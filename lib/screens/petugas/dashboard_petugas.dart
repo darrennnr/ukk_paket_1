@@ -423,7 +423,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
                     Text(
                       stat.value,
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 18,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1A1A1A),
                         letterSpacing: -0.5,

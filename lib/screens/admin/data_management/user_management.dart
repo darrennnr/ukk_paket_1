@@ -1108,6 +1108,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
+                            color: Colors.black,
                           ),
                         ),
                       ),
@@ -1132,6 +1133,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                       ),

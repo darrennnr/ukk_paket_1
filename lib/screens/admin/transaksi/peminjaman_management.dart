@@ -382,7 +382,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(
-              'Peminjaman Menunggu Persetujuan',
+              'Menunggu Persetujuan',
               peminjamanState.peminjamans.length,
             ),
             const SizedBox(height: 20),
@@ -484,7 +484,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
             backgroundColor: AppTheme.primaryColor,
             foregroundColor: AppColors.surface,
             elevation: 0,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
@@ -1350,6 +1350,7 @@ class _PeminjamanManagementState extends ConsumerState<PeminjamanManagement>
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                   ),

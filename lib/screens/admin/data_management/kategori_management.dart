@@ -592,17 +592,27 @@ class _KategoriManagementState extends ConsumerState<KategoriManagement> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () async {
+                      // Capture ScaffoldMessenger BEFORE closing the dialog
+                      // to ensure we can still show snackbar after dialog is closed
+                      final scaffoldMessenger = ScaffoldMessenger.of(this.context);
+                      final hasAlat = jumlahAlat > 0;
                       Navigator.pop(context);
                       final success = await ref
                           .read(kategoriProvider.notifier)
                           .deleteKategori(kategori.kategoriId);
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        String message;
+                        if (success) {
+                          message = 'Kategori berhasil dihapus';
+                        } else if (hasAlat) {
+                          message = 'Gagal menghapus: Kategori masih memiliki $jumlahAlat alat terkait';
+                        } else {
+                          message = 'Gagal menghapus kategori';
+                        }
+                        scaffoldMessenger.showSnackBar(
                           SnackBar(
                             content: Text(
-                              success
-                                  ? 'Kategori berhasil dihapus'
-                                  : 'Gagal menghapus kategori',
+                              message,
                               style: const TextStyle(fontSize: 13),
                             ),
                             backgroundColor: success

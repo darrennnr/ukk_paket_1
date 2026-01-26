@@ -190,6 +190,18 @@ class AdminSidebar extends ConsumerWidget {
                         route: '/admin/log-aktivitas',
                         isActive: currentRoute == '/admin/log-aktivitas',
                       ),
+
+                      const SizedBox(height: 12),
+                      _buildSectionHeader('Alat Bantu'),
+                      const SizedBox(height: 4),
+
+                      _buildMenuItem(
+                        context,
+                        icon: Icons.upload_file_rounded,
+                        title: 'Impor Data',
+                        route: '/admin/import-data',
+                        isActive: currentRoute == '/admin/import-data',
+                      ),
                     ],
                   ],
                 ),

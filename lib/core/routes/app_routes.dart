@@ -21,6 +21,7 @@ import 'package:paket_3_training/screens/peminjam/form_peminjaman.dart';
 import 'package:paket_3_training/screens/peminjam/history.dart';
 import 'package:paket_3_training/screens/peminjam/kembalikan_buku.dart';
 import 'package:paket_3_training/screens/petugas/laporan.dart';
+import 'package:paket_3_training/screens/admin/impor_data/import_data.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authNotifier = ref.watch(authProvider.notifier);
@@ -119,6 +120,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/admin/settings',
         builder: (context, state) =>
             const _PlaceholderPage(title: 'Pengaturan'),
+      ),
+      GoRoute(
+        path: '/admin/import-data',
+        builder: (context, state) => const ImportDataPage(),
       ),
 
       // Petugas Routes

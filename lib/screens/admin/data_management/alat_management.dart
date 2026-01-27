@@ -1204,7 +1204,11 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
       text: widget.alat?.fotoAlat ?? '',
     );
     _selectedKategoriId = widget.alat?.kategoriId;
-    _selectedKondisi = (widget.alat?.kondisi ?? 'baik').toLowerCase().trim();
+
+    // FIX: Normalize kondisi value dan fallback ke 'baik' jika tidak valid
+    final rawKondisi = (widget.alat?.kondisi ?? 'baik').toLowerCase().trim();
+    final validKondisi = ['baik', 'rusak ringan', 'rusak berat'];
+    _selectedKondisi = validKondisi.contains(rawKondisi) ? rawKondisi : 'baik';
   }
 
   @override
@@ -1805,8 +1809,6 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
   }
 
   Widget _buildKondisiDropdown() {
-    final normalizedValue = _selectedKondisi.toLowerCase().trim();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1820,7 +1822,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: normalizedValue,
+          value: _selectedKondisi, // Langsung gunakan tanpa normalisasi lagi
           decoration: InputDecoration(
             filled: true,
             fillColor: AppColors.surfaceContainerLowest,

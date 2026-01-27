@@ -1,15 +1,4 @@
 // lib/providers/alat_provider.dart
-//
-// REVISI: HANYA MENAMBAHKAN FUNGSI BARU, TIDAK MEMODIFIKASI YANG LAMA
-//
-// FUNGSI LAMA (TETAP):
-// - loadAlats(), searchAlats(), filterByKategori(), etc. (untuk halaman lain)
-//
-// FUNGSI BARU (TAMBAHAN):
-// - loadAlatsPaginated() - untuk pagination
-// - loadMoreAlats() - untuk lazy loading
-// - displayedAlats getter - untuk UI
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/alat_model.dart';
 import '../services/alat_services.dart';

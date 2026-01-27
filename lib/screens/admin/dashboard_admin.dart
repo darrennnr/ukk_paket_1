@@ -145,7 +145,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -439,7 +439,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
         .scale(begin: const Offset(0.95, 0.95));
   }
 
@@ -601,7 +601,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 200.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 200.ms);
   }
 
   Widget _buildAlatStatusChart(Map<String, dynamic> statistics) {
@@ -711,7 +711,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 250.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 250.ms);
   }
 
   Widget _buildLegendItem(String label, Color color) {
@@ -840,7 +840,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           ],
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: 300.ms)
+        .fadeIn(duration: 150.ms, delay: 300.ms)
         .slideY(begin: 0.1, end: 0);
   }
 
@@ -968,7 +968,7 @@ class _DashboardAdminState extends ConsumerState<DashboardAdmin> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (350 + index * 80).ms)
+        .fadeIn(duration: 150.ms, delay: (350 + index * 80).ms)
         .slideX(begin: 0.05, end: 0);
   }
 

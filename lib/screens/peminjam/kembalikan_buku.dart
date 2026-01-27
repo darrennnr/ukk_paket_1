@@ -374,7 +374,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           ],
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -423,7 +423,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           itemBuilder: (context, index) => _buildStatCard(stats[index], index),
         );
       },
-    ).animate().fadeIn(duration: 400.ms, delay: 100.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 100.ms);
   }
 
   Widget _buildStatCard(_StatCard stat, int index) {
@@ -532,7 +532,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           });
         },
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
   }
 
   // ============================================================================
@@ -567,7 +567,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 200.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 200.ms);
   }
 
   // ============================================================================
@@ -932,7 +932,7 @@ class _KembalikanBukuScreenState extends ConsumerState<KembalikanBukuScreen> {
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 50).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (index * 50).ms);
   }
 
   Widget _buildDetailItem(IconData icon, String label, String value) {

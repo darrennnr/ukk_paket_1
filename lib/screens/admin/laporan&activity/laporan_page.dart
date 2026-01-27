@@ -290,7 +290,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -448,7 +448,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: 100.ms)
+        .fadeIn(duration: 150.ms, delay: 100.ms)
         .slideY(begin: 0.05, end: 0);
   }
 
@@ -706,7 +706,7 @@ class _LaporanPageState extends ConsumerState<LaporanPage> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: 200.ms)
+        .fadeIn(duration: 150.ms, delay: 200.ms)
         .slideY(begin: 0.05, end: 0);
   }
 

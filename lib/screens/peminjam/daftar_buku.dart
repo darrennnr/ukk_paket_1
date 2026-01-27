@@ -1,4 +1,5 @@
 // lib/screens/peminjam/daftar_buku.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -93,9 +94,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
             Container(
               width: 260,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 border: Border(
-                  right: BorderSide(color: Colors.grey.shade200, width: 1),
+                  right: BorderSide(color: AppColors.borderMedium, width: 1),
                 ),
               ),
               child: PenggunaSidebar(currentRoute: '/peminjam/buku'),
@@ -179,22 +180,22 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
   PreferredSizeWidget _buildAppBar(BuildContext context, String userName) {
     return AppBar(
       elevation: 0,
-      backgroundColor: Colors.white,
-      surfaceTintColor: Colors.white,
+      backgroundColor: AppColors.surface,
+      surfaceTintColor: AppColors.surface,
       leading: _isDesktop
           ? null
           : IconButton(
               icon: Icon(
                 Icons.menu_rounded,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
                 size: 22,
               ),
               onPressed: () => _scaffoldKey.currentState?.openDrawer(),
             ),
-      title: Text(
+      title: const Text(
         'Daftar Buku',
         style: TextStyle(
-          color: const Color(0xFF1A1A1A),
+          color: Color(0xFF1A1A1A),
           fontSize: 16,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.2,
@@ -208,7 +209,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
       ],
       bottom: PreferredSize(
         preferredSize: const Size.fromHeight(1),
-        child: Container(height: 1, color: Colors.grey.shade200),
+        child: Container(height: 1, color: AppColors.borderMedium),
       ),
     );
   }
@@ -221,9 +222,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppColors.surfaceContainerLow,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: AppColors.borderMedium),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -239,7 +240,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                 child: Text(
                   userName[0].toUpperCase(),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.surface,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -261,7 +262,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
             Icon(
               Icons.keyboard_arrow_down_rounded,
               size: 18,
-              color: Colors.grey.shade600,
+              color: AppColors.textSecondary,
             ),
           ],
         ),
@@ -278,7 +279,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
               Icon(
                 Icons.person_outline_rounded,
                 size: 18,
-                color: Colors.grey.shade700,
+                color: AppColors.textPrimary,
               ),
               const SizedBox(width: 10),
               const Text('Profil', style: TextStyle(fontSize: 13)),
@@ -339,9 +340,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Katalog Buku',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF1A1A1A),
@@ -353,7 +354,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                     'Temukan dan pinjam buku yang Anda butuhkan',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey.shade600,
+                      color: AppColors.textSecondary,
                       letterSpacing: 0,
                     ),
                   ),
@@ -363,7 +364,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           ],
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -372,9 +373,9 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
   Widget _buildSearchBar() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        border: Border.all(color: AppColors.borderMedium, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -386,18 +387,18 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
       child: TextField(
         decoration: InputDecoration(
           hintText: 'Cari judul buku atau kategori...',
-          hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+          hintStyle: TextStyle(color: AppColors.textHint, fontSize: 13),
           prefixIcon: Icon(
             Icons.search_rounded,
             size: 20,
-            color: Colors.grey.shade500,
+            color: AppColors.textTertiary,
           ),
           suffixIcon: _searchQuery.isNotEmpty
               ? IconButton(
                   icon: Icon(
                     Icons.clear_rounded,
                     size: 18,
-                    color: Colors.grey.shade500,
+                    color: AppColors.textTertiary,
                   ),
                   onPressed: () {
                     setState(() {
@@ -412,14 +413,14 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
             vertical: 14,
           ),
         ),
-        style: const TextStyle(fontSize: 13),
+        style: const TextStyle(fontSize: 13, color: Color(0xFF1A1A1A)),
         onChanged: (value) {
           setState(() {
             _searchQuery = value;
           });
         },
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 100.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 100.ms);
   }
 
   // ============================================================================
@@ -436,7 +437,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: Colors.grey.shade700,
+            color: AppColors.textPrimary,
             letterSpacing: 0.2,
           ),
         ),
@@ -473,7 +474,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
   }
 
   Widget _buildCategoryChip({
@@ -489,10 +490,10 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: isSelected ? AppTheme.primaryColor : Colors.white,
+            color: isSelected ? AppTheme.primaryColor : AppColors.surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isSelected ? AppTheme.primaryColor : Colors.grey.shade300,
+              color: isSelected ? AppTheme.primaryColor : AppColors.borderMedium,
               width: 1,
             ),
           ),
@@ -501,7 +502,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-              color: isSelected ? Colors.white : Colors.grey.shade700,
+              color: isSelected ? AppColors.surface : AppColors.textPrimary,
               letterSpacing: -0.1,
             ),
           ),
@@ -542,7 +543,7 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 200.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 200.ms);
   }
 
   // ============================================================================
@@ -571,144 +572,158 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
             );
           }
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isAvailable ? Colors.grey.shade200 : Colors.grey.shade300,
-              width: 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.03),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: AppColors.borderMedium, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Book Image
-              Stack(
-                children: [
-                  Container(
-                    height: 110,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                      ),
+              // Book Image - Portrait 3:4 ratio
+              Expanded(
+                flex: 5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceContainerLow,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(10),
                     ),
-                    child: book.fotoAlat != null && book.fotoAlat!.isNotEmpty
-                        ? ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(12),
-                              topRight: Radius.circular(12),
-                            ),
-                            child: Image.network(
-                              book.fotoAlat!,
-                              width: double.infinity,
-                              height: 140,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Center(
+                  ),
+                  child: Stack(
+                    children: [
+                      if (book.fotoAlat != null && book.fotoAlat!.isNotEmpty)
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(10),
+                          ),
+                          child: Image.network(
+                            book.fotoAlat!,
+                            width: double.infinity,
+                            height: double.infinity,
+                            fit: BoxFit.cover,
+                            headers: kIsWeb
+                                ? {'Cache-Control': 'no-cache'}
+                                : null,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                    color: AppTheme.primaryColor,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              if (kDebugMode) {
+                                print('❌ Image load error: $error');
+                              }
+                              return Center(
                                 child: Icon(
                                   Icons.menu_book_rounded,
-                                  size: 56,
-                                  color: Colors.grey.shade400,
+                                  size: 40,
+                                  color: AppColors.textHint,
                                 ),
-                              ),
-                            ),
-                          )
-                        : Center(
-                            child: Icon(
-                              Icons.menu_book_rounded,
-                              size: 56,
-                              color: Colors.grey.shade400,
-                            ),
+                              );
+                            },
                           ),
-                  ),
-                  // Availability Badge
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isAvailable
-                            ? const Color(0xFF4CAF50)
-                            : Colors.grey.shade400,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        isAvailable ? 'Tersedia' : 'Habis',
-                        style: const TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 0.3,
+                        )
+                      else
+                        Center(
+                          child: Icon(
+                            Icons.menu_book_rounded,
+                            size: 40,
+                            color: AppColors.textHint,
+                          ),
                         ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              // Book Info
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      Text(
-                        book.namaAlat,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1A1A1A),
-                          height: 1.3,
-                          letterSpacing: -0.1,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Category
-                      if (book.kategori != null)
-                        Container(
+                      // Availability Badge
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(4),
+                            color: isAvailable
+                                ? const Color(0xFF4CAF50)
+                                : const Color(0xFFFF5252),
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 3,
+                                offset: const Offset(0, 1),
+                              ),
+                            ],
                           ),
                           child: Text(
-                            book.kategori!.namaKategori,
-                            style: TextStyle(
-                              fontSize: 10,
+                            isAvailable ? 'Tersedia' : 'Habis',
+                            style: const TextStyle(
+                              fontSize: 9,
+                              color: AppColors.surface,
                               fontWeight: FontWeight.w600,
-                              color: AppTheme.primaryColor,
-                              letterSpacing: 0.1,
                             ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
 
-                      const Spacer(),
-
-                      // Stock & Price Info
+              // Book Info - Compact version
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title
+                          Text(
+                            book.namaAlat,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1A1A1A),
+                              letterSpacing: -0.1,
+                              height: 1.2,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 3),
+                          // Category
+                          if (book.kategori != null)
+                            Text(
+                              book.kategori!.namaKategori,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: AppColors.textSecondary,
+                                height: 1,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                      // Stock & Action
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -716,86 +731,61 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
                             children: [
                               Icon(
                                 Icons.inventory_2_outlined,
-                                size: 12,
-                                color: Colors.grey.shade600,
+                                size: 10,
+                                color: AppColors.textTertiary,
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 3),
                               Text(
                                 'Stok: ${book.jumlahTersedia}/${book.jumlahTotal}',
                                 style: TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey.shade600,
-                                  fontWeight: FontWeight.w500,
+                                  fontSize: 10,
+                                  color: book.jumlahTersedia > 0
+                                      ? const Color(0xFF4CAF50)
+                                      : const Color(0xFFFF5252),
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.attach_money_rounded,
-                                size: 12,
-                                color: Colors.grey.shade600,
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                child: Text(
-                                  book.hargaPerhari != null
-                                      ? 'Rp ${book.hargaPerhari!.toStringAsFixed(0)}/hari'
-                                      : 'Gratis',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.grey.shade600,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                          const SizedBox(height: 6),
+                          // Action Button
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            decoration: BoxDecoration(
+                              color: isAvailable
+                                  ? AppTheme.primaryColor
+                                  : AppColors.borderMedium,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  isAvailable
+                                      ? Icons.add_circle_outline_rounded
+                                      : Icons.block_rounded,
+                                  size: 12,
+                                  color: isAvailable
+                                      ? AppColors.surface
+                                      : AppColors.textSecondary,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                Text(
+                                  isAvailable ? 'PINJAM' : 'HABIS',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: isAvailable
+                                        ? AppColors.surface
+                                        : AppColors.textSecondary,
+                                    letterSpacing: 0.3,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      // Action Button
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        decoration: BoxDecoration(
-                          color: isAvailable
-                              ? AppTheme.primaryColor
-                              : Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(7),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              isAvailable
-                                  ? Icons.add_circle_outline_rounded
-                                  : Icons.block_rounded,
-                              size: 14,
-                              color: isAvailable
-                                  ? Colors.white
-                                  : Colors.grey.shade600,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              isAvailable ? 'PINJAM BUKU' : 'TIDAK TERSEDIA',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: isAvailable
-                                    ? Colors.white
-                                    : Colors.grey.shade600,
-                                letterSpacing: 0.3,
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),
@@ -805,7 +795,10 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 50).ms);
+    )
+        .animate()
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
+        .scale(begin: const Offset(0.95, 0.95));
   }
 
   // ============================================================================
@@ -813,36 +806,39 @@ class _DaftarBukuScreenState extends ConsumerState<DaftarBukuScreen> {
   // ============================================================================
   Widget _buildEmptyState() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              shape: BoxShape.circle,
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainerLow,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_off_rounded,
+                size: 48,
+                color: AppColors.textHint,
+              ),
             ),
-            child: Icon(
-              Icons.search_off_rounded,
-              size: 56,
-              color: Colors.grey.shade400,
+            const SizedBox(height: 16),
+            const Text(
+              'Buku Tidak Ditemukan',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1A1A1A),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Buku Tidak Ditemukan',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
+            const SizedBox(height: 4),
+            Text(
+              'Coba gunakan kata kunci lain',
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Coba gunakan kata kunci lain',
-            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,17 +1,36 @@
 // lib/providers/alat_provider.dart
+//
+// REVISI: HANYA MENAMBAHKAN FUNGSI BARU, TIDAK MEMODIFIKASI YANG LAMA
+//
+// FUNGSI LAMA (TETAP):
+// - loadAlats(), searchAlats(), filterByKategori(), etc. (untuk halaman lain)
+//
+// FUNGSI BARU (TAMBAHAN):
+// - loadAlatsPaginated() - untuk pagination
+// - loadMoreAlats() - untuk lazy loading
+// - displayedAlats getter - untuk UI
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/alat_model.dart';
 import '../services/alat_services.dart';
 
 // ============================================================================
-// ALAT STATE
+// ALAT STATE (DITAMBAHKAN FIELD BARU, FIELD LAMA TETAP)
 // ============================================================================
 class AlatState {
+  // FIELD LAMA (TETAP)
   final List<AlatModel> alats;
   final bool isLoading;
   final String? errorMessage;
   final String searchQuery;
   final int? selectedKategoriId;
+
+  // FIELD BARU (TAMBAHAN UNTUK PAGINATION)
+  final List<AlatModel> cachedAlats; // Full cache untuk pagination
+  final int currentPage;
+  final bool isLoadingMore;
+  final bool hasMoreData;
+  static const int pageSize = 16;
 
   const AlatState({
     this.alats = const [],
@@ -19,6 +38,11 @@ class AlatState {
     this.errorMessage,
     this.searchQuery = '',
     this.selectedKategoriId,
+    // New fields for pagination
+    this.cachedAlats = const [],
+    this.currentPage = 0,
+    this.isLoadingMore = false,
+    this.hasMoreData = true,
   });
 
   AlatState copyWith({
@@ -27,6 +51,11 @@ class AlatState {
     String? errorMessage,
     String? searchQuery,
     int? selectedKategoriId,
+    // New parameters
+    List<AlatModel>? cachedAlats,
+    int? currentPage,
+    bool? isLoadingMore,
+    bool? hasMoreData,
   }) {
     return AlatState(
       alats: alats ?? this.alats,
@@ -34,6 +63,10 @@ class AlatState {
       errorMessage: errorMessage,
       searchQuery: searchQuery ?? this.searchQuery,
       selectedKategoriId: selectedKategoriId ?? this.selectedKategoriId,
+      cachedAlats: cachedAlats ?? this.cachedAlats,
+      currentPage: currentPage ?? this.currentPage,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMoreData: hasMoreData ?? this.hasMoreData,
     );
   }
 
@@ -44,6 +77,10 @@ class AlatState {
       errorMessage: null,
       searchQuery: searchQuery,
       selectedKategoriId: selectedKategoriId,
+      cachedAlats: cachedAlats,
+      currentPage: currentPage,
+      isLoadingMore: isLoadingMore,
+      hasMoreData: hasMoreData,
     );
   }
 
@@ -54,12 +91,23 @@ class AlatState {
       errorMessage: errorMessage,
       searchQuery: searchQuery,
       selectedKategoriId: selectedKategoriId,
+      cachedAlats: cachedAlats,
+      currentPage: currentPage,
+      isLoadingMore: isLoadingMore,
+      hasMoreData: hasMoreData,
     );
   }
+
+  // GETTER BARU: untuk mendapatkan displayed alats (paginated)
+  List<AlatModel> get displayedAlats => alats;
+
+  // GETTER BARU: untuk total count
+  int get totalCount =>
+      cachedAlats.isNotEmpty ? cachedAlats.length : alats.length;
 }
 
 // ============================================================================
-// ALAT NOTIFIER
+// ALAT NOTIFIER (FUNGSI LAMA TETAP, FUNGSI BARU DITAMBAHKAN)
 // ============================================================================
 class AlatNotifier extends Notifier<AlatState> {
   late final AlatService _alatService;
@@ -78,7 +126,11 @@ class AlatNotifier extends Notifier<AlatState> {
     }
   }
 
-  // Load all alats with filters
+  // ============================================================================
+  // FUNGSI LAMA (TIDAK DIUBAH) - Untuk halaman lain yang sudah ada
+  // ============================================================================
+
+  // Load all alats with filters (FUNGSI LAMA - TETAP)
   Future<void> loadAlats({String? search, int? kategoriId}) async {
     try {
       state = state.setLoading(true).clearError();
@@ -106,7 +158,7 @@ class AlatNotifier extends Notifier<AlatState> {
     }
   }
 
-  // Search alats
+  // Search alats (FUNGSI LAMA - TETAP)
   Future<void> searchAlats(String query) async {
     await loadAlats(
       search: query.isEmpty ? null : query,
@@ -114,7 +166,7 @@ class AlatNotifier extends Notifier<AlatState> {
     );
   }
 
-  // Filter by kategori
+  // Filter by kategori (FUNGSI LAMA - TETAP)
   Future<void> filterByKategori(int? kategoriId) async {
     await loadAlats(
       search: state.searchQuery.isEmpty ? null : state.searchQuery,
@@ -122,12 +174,12 @@ class AlatNotifier extends Notifier<AlatState> {
     );
   }
 
-  // Clear filters
+  // Clear filters (FUNGSI LAMA - TETAP)
   Future<void> clearFilters() async {
     await loadAlats();
   }
 
-  // Get alat by ID
+  // Get alat by ID (FUNGSI LAMA - TETAP)
   Future<AlatModel?> getAlatById(int alatId) async {
     try {
       return await _alatService.getAlatById(alatId);
@@ -139,7 +191,7 @@ class AlatNotifier extends Notifier<AlatState> {
     }
   }
 
-  // Create alat
+  // Create alat (FUNGSI LAMA - TETAP)
   Future<bool> createAlat(AlatModel alat) async {
     try {
       state = state.setLoading(true).clearError();
@@ -160,8 +212,7 @@ class AlatNotifier extends Notifier<AlatState> {
     }
   }
 
-  // Update alat
-  // Update alat
+  // Update alat (FUNGSI LAMA - TETAP)
   Future<bool> updateAlat(AlatModel alat, {String? oldFotoUrl}) async {
     try {
       state = state.setLoading(true).clearError();
@@ -182,7 +233,7 @@ class AlatNotifier extends Notifier<AlatState> {
     }
   }
 
-  // Delete alat
+  // Delete alat (FUNGSI LAMA - TETAP)
   Future<bool> deleteAlat(int alatId) async {
     try {
       state = state.setLoading(true).clearError();
@@ -203,7 +254,7 @@ class AlatNotifier extends Notifier<AlatState> {
     }
   }
 
-  // Refresh data
+  // Refresh data (FUNGSI LAMA - TETAP)
   Future<void> refresh() async {
     await loadAlats(
       search: state.searchQuery.isEmpty ? null : state.searchQuery,
@@ -211,14 +262,192 @@ class AlatNotifier extends Notifier<AlatState> {
     );
   }
 
-  // Clear error
+  // Clear error (FUNGSI LAMA - TETAP)
   void clearError() {
     state = state.clearError();
+  }
+
+  // ============================================================================
+  // FUNGSI BARU (TAMBAHAN) - Khusus untuk pagination di alat_management
+  // ============================================================================
+
+  // FUNGSI BARU: Load alats dengan pagination
+  Future<void> loadAlatsPaginated({String? search, int? kategoriId}) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      // Fetch ALL data dan simpan di cache
+      final allAlats = await _alatService.getAllAlat(
+        search: search,
+        kategoriId: kategoriId,
+      );
+
+      // Display hanya 16 items pertama
+      final displayedAlats = allAlats.take(AlatState.pageSize).toList();
+
+      state = state.copyWith(
+        alats: displayedAlats, // alats = displayed (untuk UI)
+        cachedAlats: allAlats, // cachedAlats = full data
+        isLoading: false,
+        searchQuery: search ?? '',
+        selectedKategoriId: kategoriId,
+        currentPage: 1,
+        hasMoreData: allAlats.length > AlatState.pageSize,
+      );
+
+      _hasInitialized = true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal memuat data alat: ${e.toString()}',
+      );
+    }
+  }
+
+  // FUNGSI BARU: Load more items (lazy loading)
+  Future<void> loadMoreAlats() async {
+    // Don't load if already loading, no more data, or not using pagination
+    if (state.isLoadingMore ||
+        !state.hasMoreData ||
+        state.cachedAlats.isEmpty) {
+      return;
+    }
+
+    try {
+      state = state.copyWith(isLoadingMore: true);
+
+      // Calculate next batch from cache
+      final startIndex = state.currentPage * AlatState.pageSize;
+      final endIndex = startIndex + AlatState.pageSize;
+
+      if (startIndex < state.cachedAlats.length) {
+        final nextBatch = state.cachedAlats
+            .skip(startIndex)
+            .take(AlatState.pageSize)
+            .toList();
+
+        final updatedDisplayed = [...state.alats, ...nextBatch];
+
+        state = state.copyWith(
+          alats: updatedDisplayed,
+          isLoadingMore: false,
+          currentPage: state.currentPage + 1,
+          hasMoreData: endIndex < state.cachedAlats.length,
+        );
+      } else {
+        state = state.copyWith(isLoadingMore: false, hasMoreData: false);
+      }
+    } catch (e) {
+      state = state.copyWith(
+        isLoadingMore: false,
+        errorMessage: 'Gagal memuat data tambahan: ${e.toString()}',
+      );
+    }
+  }
+
+  // FUNGSI BARU: Search dengan pagination
+  Future<void> searchAlatsPaginated(String query) async {
+    await loadAlatsPaginated(
+      search: query.isEmpty ? null : query,
+      kategoriId: state.selectedKategoriId,
+    );
+  }
+
+  // FUNGSI BARU: Filter dengan pagination
+  Future<void> filterByKategoriPaginated(int? kategoriId) async {
+    await loadAlatsPaginated(
+      search: state.searchQuery.isEmpty ? null : state.searchQuery,
+      kategoriId: kategoriId,
+    );
+  }
+
+  // FUNGSI BARU: Refresh dengan pagination
+  Future<void> refreshPaginated() async {
+    await loadAlatsPaginated(
+      search: state.searchQuery.isEmpty ? null : state.searchQuery,
+      kategoriId: state.selectedKategoriId,
+    );
+  }
+
+  // FUNGSI BARU: Create alat dengan pagination
+  Future<bool> createAlatPaginated(AlatModel alat) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      await _alatService.createAlat(alat);
+
+      // Refresh dengan pagination
+      await loadAlatsPaginated(
+        search: state.searchQuery.isEmpty ? null : state.searchQuery,
+        kategoriId: state.selectedKategoriId,
+      );
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal menambah alat: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  // FUNGSI BARU: Update alat dengan pagination
+  Future<bool> updateAlatPaginated(AlatModel alat, {String? oldFotoUrl}) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      await _alatService.updateAlat(alat, oldFotoUrl: oldFotoUrl);
+
+      // Refresh dengan pagination
+      await loadAlatsPaginated(
+        search: state.searchQuery.isEmpty ? null : state.searchQuery,
+        kategoriId: state.selectedKategoriId,
+      );
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal mengubah alat: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  // FUNGSI BARU: Delete alat dengan pagination
+  Future<bool> deleteAlatPaginated(int alatId) async {
+    try {
+      state = state.setLoading(true).clearError();
+
+      await _alatService.deleteAlat(alatId);
+
+      // Refresh dengan pagination
+      await loadAlatsPaginated(
+        search: state.searchQuery.isEmpty ? null : state.searchQuery,
+        kategoriId: state.selectedKategoriId,
+      );
+
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Gagal menghapus alat: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  // FUNGSI BARU: Initialize dengan pagination
+  void ensureInitializedPaginated() {
+    if (!_hasInitialized && !state.isLoading) {
+      loadAlatsPaginated();
+    }
   }
 }
 
 // ============================================================================
-// ALAT TERSEDIA NOTIFIER (Separate provider for available alats)
+// ALAT TERSEDIA NOTIFIER (TIDAK DIUBAH)
 // ============================================================================
 class AlatTersediaNotifier extends Notifier<AlatState> {
   late final AlatService _alatService;
@@ -227,7 +456,6 @@ class AlatTersediaNotifier extends Notifier<AlatState> {
   @override
   AlatState build() {
     _alatService = AlatService();
-    // DO NOT auto-load here
     return const AlatState();
   }
 
@@ -260,7 +488,7 @@ class AlatTersediaNotifier extends Notifier<AlatState> {
 }
 
 // ============================================================================
-// PROVIDERS
+// PROVIDERS (TIDAK DIUBAH)
 // ============================================================================
 
 // Main alat provider
@@ -276,7 +504,7 @@ final alatTersediaProvider = NotifierProvider<AlatTersediaNotifier, AlatState>(
 );
 
 // ============================================================================
-// HELPER PROVIDERS
+// HELPER PROVIDERS (TIDAK DIUBAH - Tetap pakai state.alats)
 // ============================================================================
 
 // Alat count provider

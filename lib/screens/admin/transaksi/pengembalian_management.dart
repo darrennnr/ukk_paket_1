@@ -447,7 +447,7 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   Widget _buildSearchAndFilter() {
@@ -663,7 +663,7 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
   }
 
   Widget _buildTableRow(PengembalianModel item, int index, bool isActionTab) {
@@ -1041,7 +1041,7 @@ class _PengembalianManagementState extends ConsumerState<PengembalianManagement>
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
         .scale(begin: const Offset(0.95, 0.95));
   }
 

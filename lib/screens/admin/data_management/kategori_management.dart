@@ -267,7 +267,7 @@ class _KategoriManagementState extends ConsumerState<KategoriManagement> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -428,7 +428,7 @@ class _KategoriManagementState extends ConsumerState<KategoriManagement> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
         .scale(begin: const Offset(0.95, 0.95));
   }
 

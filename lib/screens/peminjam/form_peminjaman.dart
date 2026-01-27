@@ -320,7 +320,7 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
           ],
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -429,7 +429,7 @@ class _FormPeminjamanScreenState extends ConsumerState<FormPeminjamanScreen> {
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 100.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 100.ms);
   }
 
   Widget _buildFieldLabel(String label, {bool isRequired = false}) {

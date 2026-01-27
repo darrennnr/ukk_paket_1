@@ -316,7 +316,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           ],
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   Widget _buildStatChip(String label, int count, Color color) {
@@ -543,7 +543,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
   }
 
   Widget _buildUserRow(UserModel user, int index) {
@@ -772,7 +772,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (150 + index * 30).ms)
+        .fadeIn(duration: 150.ms, delay: (150 + index * 30).ms)
         .slideX(begin: 0.03, end: 0);
   }
 
@@ -915,7 +915,7 @@ class _UserManagementState extends ConsumerState<UserManagement> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
         .scale(begin: const Offset(0.95, 0.95));
   }
 

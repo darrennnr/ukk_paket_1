@@ -157,7 +157,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -446,7 +446,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
         .scale(begin: const Offset(0.95, 0.95));
   }
 
@@ -535,7 +535,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
           },
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 200.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 200.ms);
   }
 
   Widget _buildQuickActionCard(_QuickAction action) {
@@ -681,7 +681,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 250.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 250.ms);
   }
 
   Widget _buildPendingItem(peminjaman, int index) {
@@ -780,7 +780,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (300 + index * 80).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (300 + index * 80).ms);
   }
 
   // ============================================================================
@@ -879,7 +879,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 300.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 300.ms);
   }
 
   Widget _buildActiveItem(peminjaman, int index) {
@@ -979,7 +979,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (350 + index * 80).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (350 + index * 80).ms);
   }
 
   // ============================================================================
@@ -1136,7 +1136,7 @@ class _DashboardPetugasState extends ConsumerState<DashboardPetugas> {
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 350.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 350.ms);
   }
 
   // ============================================================================

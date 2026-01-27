@@ -393,7 +393,7 @@ class _HistoryPeminjamanScreenState
           ],
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -474,7 +474,7 @@ class _HistoryPeminjamanScreenState
           itemBuilder: (context, index) => _buildStatCard(stats[index], index),
         );
       },
-    ).animate().fadeIn(duration: 400.ms, delay: 100.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 100.ms);
   }
 
   Widget _buildStatCard(_StatCard stat, int index) {
@@ -579,7 +579,7 @@ class _HistoryPeminjamanScreenState
           });
         },
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
   }
 
   // ============================================================================
@@ -635,7 +635,7 @@ class _HistoryPeminjamanScreenState
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 200.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 200.ms);
   }
 
   Widget _buildFilterChip({
@@ -716,7 +716,7 @@ class _HistoryPeminjamanScreenState
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 250.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 250.ms);
   }
 
   // ============================================================================
@@ -966,7 +966,7 @@ class _HistoryPeminjamanScreenState
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 50).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (index * 50).ms);
   }
 
   Widget _buildDetailItem(IconData icon, String label, String value) {

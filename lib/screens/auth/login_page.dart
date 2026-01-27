@@ -49,7 +49,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   isTablet: isTablet,
                                 )
                                 .animate()
-                                .fadeIn(duration: 400.ms)
+                                .fadeIn(duration: 150.ms)
                                 .slideX(begin: -0.1, end: 0),
                       ),
                       SizedBox(width: isDesktop ? 60 : 40),
@@ -64,7 +64,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 isDesktop: isDesktop,
                               )
                               .animate()
-                              .fadeIn(duration: 400.ms, delay: 150.ms)
+                              .fadeIn(duration: 150.ms, delay: 150.ms)
                               .slideX(begin: 0.1, end: 0),
                     ),
                   ],

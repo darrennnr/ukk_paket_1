@@ -445,7 +445,7 @@ class _PetugasPeminjamanManagementState
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -672,7 +672,7 @@ class _PetugasPeminjamanManagementState
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
   }
 
   Widget _buildPeminjamanRow(
@@ -835,7 +835,7 @@ class _PetugasPeminjamanManagementState
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (150 + index * 30).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (150 + index * 30).ms);
   }
 
   Widget _buildActionButton({
@@ -988,7 +988,7 @@ class _PetugasPeminjamanManagementState
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 50).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (index * 50).ms);
   }
 
   Widget _buildInfoRow(IconData icon, String label, String value) {

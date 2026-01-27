@@ -351,7 +351,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           ],
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -401,7 +401,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           const Color(0xFF9C27B0),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 100.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 100.ms);
   }
 
   Widget _buildStatCard(String label, int count, IconData icon, Color color) {
@@ -678,7 +678,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
   }
 
   Widget _buildLogRow(LogAktivitasModel log, int index) {
@@ -840,7 +840,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (150 + index * 30).ms)
+        .fadeIn(duration: 150.ms, delay: (150 + index * 30).ms)
         .slideX(begin: 0.03, end: 0);
   }
 
@@ -989,7 +989,7 @@ class _LogActivityScreenState extends ConsumerState<LogActivityScreen> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
         .scale(begin: const Offset(0.95, 0.95));
   }
 

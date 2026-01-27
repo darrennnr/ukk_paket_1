@@ -176,7 +176,7 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -195,7 +195,7 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
           Expanded(child: _buildToggleButton('Pengembalian', ReportType.pengembalian, filter.reportType)),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 50.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 50.ms);
   }
 
   Widget _buildToggleButton(String label, ReportType type, ReportType current) {
@@ -310,7 +310,7 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 100.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 100.ms);
   }
 
   Widget _buildTimeChip(String label, TimePreset preset, TimePreset current) {
@@ -546,7 +546,7 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
             ],
           );
         },
-      ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+      ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
     } else {
       final data = state.pengembalianData;
       final totalDenda = data.fold<int>(0, (sum, p) => sum + (p.totalPembayaran ?? 0));
@@ -564,7 +564,7 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
             ],
           );
         },
-      ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+      ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
     }
   }
 
@@ -661,7 +661,7 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms, delay: 200.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 200.ms);
   }
 
   Future<void> _exportPDF(LaporanState state) async {
@@ -808,7 +808,7 @@ class _LaporanPetugasState extends ConsumerState<LaporanPetugas> {
         borderRadius: BorderRadius.circular(10),
         child: isPeminjaman ? _buildPeminjamanTable(state.peminjamanData) : _buildPengembalianTable(state.pengembalianData),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 250.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 250.ms);
   }
 
   Widget _buildPeminjamanTable(List data) {

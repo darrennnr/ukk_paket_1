@@ -28,6 +28,7 @@ class AlatManagement extends ConsumerStatefulWidget {
 class _AlatManagementState extends ConsumerState<AlatManagement> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   int? _selectedKategoriFilter;
 
   bool get _isDesktop => MediaQuery.of(context).size.width >= 900;
@@ -39,14 +40,27 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(alatProvider.notifier).ensureInitialized();
+      // GUNAKAN FUNGSI BARU: ensureInitializedPaginated()
+      ref.read(alatProvider.notifier).ensureInitializedPaginated();
       ref.read(kategoriProvider.notifier).ensureInitialized();
     });
+
+    // Setup scroll listener for pagination
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      // Load more when near bottom - GUNAKAN FUNGSI BARU
+      ref.read(alatProvider.notifier).loadMoreAlats();
+    }
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -74,26 +88,63 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
             ),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => ref.read(alatProvider.notifier).refresh(),
+              onRefresh: () =>
+                  ref.read(alatProvider.notifier).refreshPaginated(),
               color: AppTheme.primaryColor,
-              child: SingleChildScrollView(
+              child: CustomScrollView(
+                controller: _scrollController,
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: EdgeInsets.all(_isDesktop ? 24 : 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
-                    const SizedBox(height: 20),
-                    _buildSearchAndFilter(),
-                    const SizedBox(height: 20),
-                    if (alatState.isLoading && alatState.alats.isEmpty)
-                      _buildLoadingSkeleton()
-                    else if (alatState.alats.isEmpty)
-                      _buildEmptyState()
-                    else
-                      _buildAlatGrid(alatState.alats),
-                  ],
-                ),
+                slivers: [
+                  SliverPadding(
+                    padding: EdgeInsets.all(_isDesktop ? 24 : 16),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        _buildHeader(),
+                        const SizedBox(height: 20),
+                        _buildSearchAndFilter(),
+                        const SizedBox(height: 20),
+                      ]),
+                    ),
+                  ),
+                  if (alatState.isLoading && alatState.displayedAlats.isEmpty)
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: _isDesktop ? 24 : 16,
+                      ),
+                      sliver: _buildLoadingSkeletonSliver(),
+                    )
+                  else if (alatState.displayedAlats.isEmpty)
+                    SliverPadding(
+                      padding: EdgeInsets.all(_isDesktop ? 24 : 16),
+                      sliver: SliverToBoxAdapter(child: _buildEmptyState()),
+                    )
+                  else
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: _isDesktop ? 24 : 16,
+                      ),
+                      sliver: _buildAlatGridSliver(alatState.displayedAlats),
+                    ),
+                  // Loading indicator for pagination
+                  if (alatState.isLoadingMore)
+                    SliverPadding(
+                      padding: const EdgeInsets.all(16),
+                      sliver: SliverToBoxAdapter(
+                        child: Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppTheme.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  // Bottom spacing
+                  const SliverPadding(padding: EdgeInsets.only(bottom: 80)),
+                ],
               ),
             ),
           ),
@@ -250,10 +301,9 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
   // HEADER
   // ============================================================================
   Widget _buildHeader() {
-    final alatCount = ref.watch(alatProvider).alats.length;
-    final tersediaCount = ref
-        .watch(alatProvider)
-        .alats
+    final alatState = ref.watch(alatProvider);
+    final totalCount = alatState.totalCount;
+    final tersediaCount = alatState.displayedAlats
         .where((a) => a.isAvailable)
         .length;
 
@@ -274,7 +324,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
               ),
               const SizedBox(height: 4),
               Text(
-                '$alatCount total alat • $tersediaCount tersedia',
+                '$totalCount total alat • $tersediaCount tersedia',
                 style: TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
@@ -285,7 +335,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   // ============================================================================
@@ -324,7 +374,10 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                         ),
                         onPressed: () {
                           _searchController.clear();
-                          ref.read(alatProvider.notifier).searchAlats('');
+                          // GUNAKAN FUNGSI BARU
+                          ref
+                              .read(alatProvider.notifier)
+                              .searchAlatsPaginated('');
                         },
                       )
                     : null,
@@ -336,7 +389,8 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
               ),
               onChanged: (value) {
                 setState(() {});
-                ref.read(alatProvider.notifier).searchAlats(value);
+                // GUNAKAN FUNGSI BARU: searchAlatsPaginated()
+                ref.read(alatProvider.notifier).searchAlatsPaginated(value);
               },
             ),
           ),
@@ -386,7 +440,10 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
               ],
               onChanged: (value) {
                 setState(() => _selectedKategoriFilter = value);
-                ref.read(alatProvider.notifier).filterByKategori(value);
+                // GUNAKAN FUNGSI BARU: filterByKategoriPaginated()
+                ref
+                    .read(alatProvider.notifier)
+                    .filterByKategoriPaginated(value);
               },
             ),
           ),
@@ -396,26 +453,22 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
   }
 
   // ============================================================================
-  // ALAT GRID
+  // ALAT GRID (SLIVER VERSION)
   // ============================================================================
-  Widget _buildAlatGrid(List<AlatModel> alats) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossAxisCount = _isDesktop ? 4 : (_isTablet ? 3 : 2);
+  Widget _buildAlatGridSliver(List<AlatModel> alats) {
+    int crossAxisCount = _isDesktop ? 5 : (_isTablet ? 4 : 2);
 
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            childAspectRatio: _isDesktop ? 0.75 : 0.7,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-          ),
-          itemCount: alats.length,
-          itemBuilder: (context, index) => _buildAlatCard(alats[index], index),
-        );
-      },
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: _isDesktop ? 0.68 : (_isTablet ? 0.65 : 0.62),
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => _buildAlatCard(alats[index], index),
+        childCount: alats.length,
+      ),
     );
   }
 
@@ -435,171 +488,180 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image Container with proper loading and error handling
-                Container(
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerLow,
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(10),
+                // Image Container - Portrait 3:4 ratio (SMALLER SIZE)
+                Expanded(
+                  flex: 5, // Reduced from full AspectRatio to flex ratio
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerLow,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(10),
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        if (alat.fotoAlat != null && alat.fotoAlat!.isNotEmpty)
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(10),
+                            ),
+                            child: Image.network(
+                              alat.fotoAlat!,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
+                              headers: kIsWeb
+                                  ? {'Cache-Control': 'no-cache'}
+                                  : null,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          value:
+                                              loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                              : null,
+                                          color: AppTheme.primaryColor,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                              errorBuilder: (context, error, stackTrace) {
+                                if (kDebugMode) {
+                                  print('❌ Image load error: $error');
+                                }
+                                return Center(
+                                  child: Icon(
+                                    Icons.inventory_2_outlined,
+                                    size: 32,
+                                    color: AppColors.textHint,
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        else
+                          Center(
+                            child: Icon(
+                              Icons.inventory_2_outlined,
+                              size: 32,
+                              color: AppColors.textHint,
+                            ),
+                          ),
+                        // Status Badge
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isAvailable
+                                  ? const Color(0xFF4CAF50)
+                                  : const Color(0xFFFF5252),
+                              borderRadius: BorderRadius.circular(5),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 3,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              isAvailable ? 'Tersedia' : 'Habis',
+                              style: const TextStyle(
+                                fontSize: 9,
+                                color: AppColors.surface,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Stack(
-                    children: [
-                      // Display image if URL exists
-                      // Display image if URL exists
-                      if (alat.fotoAlat != null && alat.fotoAlat!.isNotEmpty)
-                        ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(10),
-                          ),
-                          child: Image.network(
-                            alat.fotoAlat!,
-                            width: double.infinity,
-                            height: 120,
-                            fit: BoxFit.cover,
-                            headers: kIsWeb
-                                ? {'Cache-Control': 'no-cache'}
-                                : null,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    value:
-                                        loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                  .cumulativeBytesLoaded /
-                                              loadingProgress
-                                                  .expectedTotalBytes!
-                                        : null,
-                                    color: AppTheme.primaryColor,
-                                  ),
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              // Print error for debugging
-                              if (kDebugMode) {
-                                print('❌ Image load error: $error');
-                              }
-                              return Center(
-                                child: Icon(
-                                  Icons.inventory_2_outlined,
-                                  size: 40,
-                                  color: AppColors.textHint,
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      else
-                        // Show icon if no image
-                        Center(
-                          child: Icon(
-                            Icons.inventory_2_outlined,
-                            size: 40,
-                            color: AppColors.textHint,
-                          ),
-                        ),
-                      // Status Badge
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isAvailable
-                                ? const Color(0xFF4CAF50)
-                                : const Color(0xFFFF5252),
-                            borderRadius: BorderRadius.circular(6),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Text(
-                            isAvailable ? 'Tersedia' : 'Habis',
-                            style: const TextStyle(
-                              fontSize: 10,
-                              color: AppColors.surface,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
                 ),
-                // Content
+                // Content - Compact version
                 Expanded(
+                  flex: 3, // Reduced content area
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(7),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          alat.namaAlat,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1A1A1A),
-                            letterSpacing: -0.1,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          kategoriName,
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const Spacer(),
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(
-                              Icons.qr_code_2_rounded,
-                              size: 12,
-                              color: AppColors.textTertiary,
-                            ),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                alat.kodeAlat,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
+                            Text(
+                              alat.namaAlat,
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1A1A1A),
+                                letterSpacing: -0.1,
+                                height: 1,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              kategoriName,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: AppColors.textSecondary,
+                                height: 1,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.qr_code_2_rounded,
+                                  size: 9,
+                                  color: AppColors.textTertiary,
+                                ),
+                                const SizedBox(width: 3),
+                                Expanded(
+                                  child: Text(
+                                    alat.kodeAlat,
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      color: AppColors.textPrimary,
+                                      fontWeight: FontWeight.w500,
+                                      height: 1,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
                         Row(
                           children: [
                             Expanded(
                               child: Text(
                                 'Stok: ${alat.jumlahTersedia}/${alat.jumlahTotal}',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   color: alat.jumlahTersedia > 0
                                       ? const Color(0xFF4CAF50)
                                       : const Color(0xFFFF5252),
@@ -610,21 +672,26 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                             PopupMenuButton(
                               icon: Icon(
                                 Icons.more_vert_rounded,
-                                size: 16,
+                                size: 14,
                                 color: AppColors.textSecondary,
                               ),
-                              offset: const Offset(0, 30),
+                              color: AppColors.surface,
+                              offset: const Offset(0, 25),
+                              padding: EdgeInsets.zero,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               itemBuilder: (context) => [
                                 PopupMenuItem(
-                                  height: 36,
+                                  height: 34,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   child: Row(
                                     children: [
                                       Icon(
                                         Icons.visibility_outlined,
-                                        size: 16,
+                                        size: 15,
                                         color: AppColors.textPrimary,
                                       ),
                                       const SizedBox(width: 8),
@@ -640,12 +707,15 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                                   ),
                                 ),
                                 PopupMenuItem(
-                                  height: 36,
+                                  height: 34,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   child: Row(
                                     children: [
                                       Icon(
                                         Icons.edit_outlined,
-                                        size: 16,
+                                        size: 15,
                                         color: AppColors.textPrimary,
                                       ),
                                       const SizedBox(width: 8),
@@ -661,12 +731,15 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                                   ),
                                 ),
                                 PopupMenuItem(
-                                  height: 36,
+                                  height: 34,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                  ),
                                   child: const Row(
                                     children: [
                                       Icon(
                                         Icons.delete_outline_rounded,
-                                        size: 16,
+                                        size: 15,
                                         color: Color(0xFFFF5252),
                                       ),
                                       SizedBox(width: 8),
@@ -697,7 +770,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
         .scale(begin: const Offset(0.95, 0.95));
   }
 
@@ -744,28 +817,30 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
   }
 
   // ============================================================================
-  // LOADING SKELETON
+  // LOADING SKELETON (SLIVER VERSION)
   // ============================================================================
-  Widget _buildLoadingSkeleton() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+  Widget _buildLoadingSkeletonSliver() {
+    int crossAxisCount = _isDesktop ? 5 : (_isTablet ? 4 : 2);
+
+    return SliverGrid(
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: _isDesktop ? 4 : 2,
-        childAspectRatio: 0.75,
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: _isDesktop ? 0.68 : (_isTablet ? 0.65 : 0.62),
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
-      itemCount: 8,
-      itemBuilder: (context, index) =>
-          Container(
-                decoration: BoxDecoration(
-                  color: AppColors.borderMedium,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              )
-              .animate(onPlay: (controller) => controller.repeat())
-              .shimmer(duration: 1200.ms),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) =>
+            Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.borderMedium,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                )
+                .animate(onPlay: (controller) => controller.repeat())
+                .shimmer(duration: 1200.ms),
+        childCount: 16,
+      ),
     );
   }
 
@@ -792,7 +867,8 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
         backgroundColor: AppColors.surface,
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: _isDesktop ? 500 : double.infinity,
+            maxWidth: _isDesktop ? 450 : double.infinity,
+            maxHeight: MediaQuery.of(context).size.height * 0.85,
           ),
           child: SingleChildScrollView(
             child: Padding(
@@ -837,23 +913,29 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 16),
+                  // Smaller detail image - 3:4 ratio
                   if (alat.fotoAlat != null && alat.fotoAlat!.isNotEmpty)
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.network(
-                        alat.fotoAlat!,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Container(
-                          height: 200,
-                          color: AppColors.surfaceContainerLow,
-                          child: Center(
-                            child: Icon(
-                              Icons.inventory_2_outlined,
-                              size: 48,
-                              color: AppColors.textHint,
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 250),
+                        child: AspectRatio(
+                          aspectRatio: 3 / 4,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              alat.fotoAlat!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                color: AppColors.surfaceContainerLow,
+                                child: Center(
+                                  child: Icon(
+                                    Icons.inventory_2_outlined,
+                                    size: 40,
+                                    color: AppColors.textHint,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -903,7 +985,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color : Colors.white,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -1023,9 +1105,10 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
                   child: ElevatedButton(
                     onPressed: () async {
                       Navigator.pop(context);
+                      // GUNAKAN FUNGSI BARU: deleteAlatPaginated()
                       final success = await ref
                           .read(alatProvider.notifier)
-                          .deleteAlat(alat.alatId);
+                          .deleteAlatPaginated(alat.alatId);
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -1074,7 +1157,7 @@ class _AlatManagementState extends ConsumerState<AlatManagement> {
 }
 
 // ============================================================================
-// FORM DIALOG WIDGET
+// FORM DIALOG WIDGET (Unchanged - keeping compact preview)
 // ============================================================================
 class _AlatFormDialog extends ConsumerStatefulWidget {
   final AlatModel? alat;
@@ -1097,7 +1180,6 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
   String _selectedKondisi = 'baik';
   bool _isLoading = false;
 
-  // Image upload state
   Uint8List? _selectedImageBytes;
   String? _selectedImageName;
   bool _useFileUpload = false;
@@ -1138,8 +1220,6 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
 
   Future<void> _pickImage() async {
     try {
-      print('🖼️ Opening image picker...');
-
       final XFile? pickedFile = await _picker.pickImage(
         source: ImageSource.gallery,
         maxWidth: 1920,
@@ -1148,26 +1228,14 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
       );
 
       if (pickedFile != null) {
-        print('✅ Image picked: ${pickedFile.name}');
-
-        // Read file as bytes
         final bytes = await pickedFile.readAsBytes();
-        print('📦 Image size: ${bytes.length} bytes');
-
         setState(() {
           _selectedImageBytes = bytes;
           _selectedImageName = pickedFile.name;
           _useFileUpload = true;
         });
-
-        print('✅ Image state updated');
-      } else {
-        print('⚠️ No image selected');
       }
-    } catch (e, stackTrace) {
-      print('❌ Pick image error: $e');
-      print('Stack trace: $stackTrace');
-
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -1196,26 +1264,15 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
     try {
       String? imageUrl;
 
-      // Upload image if file is selected
       if (_useFileUpload &&
           _selectedImageBytes != null &&
           _selectedImageName != null) {
-        print('📤 Starting upload...');
-        print('File name: $_selectedImageName');
-        print('File size: ${_selectedImageBytes!.length} bytes');
-
         imageUrl = await _storageService.uploadImage(
           fileBytes: _selectedImageBytes!,
           fileName: _selectedImageName!,
         );
-
-        print('✅ Upload complete! URL: $imageUrl');
       } else if (!_useFileUpload && _fotoUrlController.text.trim().isNotEmpty) {
-        // Use URL input
         imageUrl = _fotoUrlController.text.trim();
-        print('🔗 Using URL: $imageUrl');
-      } else {
-        print('ℹ️ No image provided');
       }
 
       final alat = AlatModel(
@@ -1232,13 +1289,12 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
         fotoAlat: imageUrl,
       );
 
-      print('💾 Saving alat with foto: ${alat.fotoAlat}');
-
+      // GUNAKAN FUNGSI BARU: createAlatPaginated()
       final success = widget.alat == null
-          ? await ref.read(alatProvider.notifier).createAlat(alat)
+          ? await ref.read(alatProvider.notifier).createAlatPaginated(alat)
           : await ref
                 .read(alatProvider.notifier)
-                .updateAlat(alat, oldFotoUrl: widget.alat?.fotoAlat);
+                .updateAlatPaginated(alat, oldFotoUrl: widget.alat?.fotoAlat);
 
       if (mounted) {
         setState(() => _isLoading = false);
@@ -1261,10 +1317,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
           ),
         );
       }
-    } catch (e, stackTrace) {
-      print('❌ Submit error: $e');
-      print('Stack trace: $stackTrace');
-
+    } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1286,7 +1339,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       backgroundColor: AppColors.surface,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 500, maxHeight: 650),
+        constraints: const BoxConstraints(maxWidth: 480, maxHeight: 650),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1474,7 +1527,6 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
               ),
             ),
             const Spacer(),
-            // Toggle between file upload and URL
             Row(
               children: [
                 Text(
@@ -1490,9 +1542,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                   onChanged: (value) {
                     setState(() {
                       _useFileUpload = value;
-                      if (!value) {
-                        _clearImage();
-                      }
+                      if (!value) _clearImage();
                     });
                   },
                   activeColor: AppTheme.primaryColor,
@@ -1503,8 +1553,6 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
           ],
         ),
         const SizedBox(height: 8),
-
-        // Show file upload button if toggle is on
         if (_useFileUpload) ...[
           InkWell(
             onTap: _pickImage,
@@ -1520,13 +1568,18 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
               child: Column(
                 children: [
                   if (_selectedImageBytes != null) ...[
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.memory(
-                        _selectedImageBytes!,
-                        height: 120,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
+                    // Smaller preview in form - max 200px wide
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 200),
+                      child: AspectRatio(
+                        aspectRatio: 3 / 4,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.memory(
+                            _selectedImageBytes!,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -1543,7 +1596,7 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
                     TextButton.icon(
                       onPressed: _clearImage,
                       icon: const Icon(Icons.close_rounded, size: 16),
-                      label: const Text('Hapus',),
+                      label: const Text('Hapus'),
                       style: TextButton.styleFrom(
                         foregroundColor: const Color(0xFFFF5252),
                         textStyle: const TextStyle(fontSize: 12),
@@ -1575,7 +1628,6 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
             ),
           ),
         ] else ...[
-          // Show URL input if toggle is off
           TextFormField(
             controller: _fotoUrlController,
             style: const TextStyle(fontSize: 13),
@@ -1605,24 +1657,29 @@ class _AlatFormDialogState extends ConsumerState<_AlatFormDialog> {
               ),
             ),
           ),
-          // Preview URL if exists
           if (_fotoUrlController.text.isNotEmpty) ...[
             const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                _fotoUrlController.text,
-                height: 120,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
-                  height: 120,
-                  color: AppColors.surfaceContainerLow,
-                  child: Center(
-                    child: Icon(
-                      Icons.broken_image_outlined,
-                      size: 40,
-                      color: AppColors.textHint,
+            // Smaller URL preview
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 200),
+                child: AspectRatio(
+                  aspectRatio: 3 / 4,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      _fotoUrlController.text,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        color: AppColors.surfaceContainerLow,
+                        child: Center(
+                          child: Icon(
+                            Icons.broken_image_outlined,
+                            size: 32,
+                            color: AppColors.textHint,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

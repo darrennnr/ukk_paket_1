@@ -468,7 +468,7 @@ class _PetugasPengembalianManagementState
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   Widget _buildAdvancedFilterPanel() {
@@ -961,7 +961,7 @@ class _PetugasPengembalianManagementState
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: 150.ms);
+    ).animate().fadeIn(duration: 150.ms, delay: 150.ms);
   }
 
   Widget _buildTableRow(PengembalianModel item, int index) {
@@ -1309,7 +1309,7 @@ class _PetugasPengembalianManagementState
           ),
         )
         .animate()
-        .fadeIn(duration: 400.ms, delay: (index * 50).ms)
+        .fadeIn(duration: 150.ms, delay: (index * 50).ms)
         .scale(begin: const Offset(0.95, 0.95));
   }
 

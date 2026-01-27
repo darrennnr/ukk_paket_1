@@ -453,7 +453,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
           ),
         ),
       ],
-    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
+    ).animate().fadeIn(duration: 150.ms).slideY(begin: -0.1, end: 0);
   }
 
   Widget _buildStatisticsGrid(int total, int aktif, int pending) {
@@ -554,7 +554,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 50).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (index * 50).ms);
   }
 
   Widget _buildSectionHeader(String title, IconData icon, Color color) {
@@ -712,7 +712,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 80).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (index * 80).ms);
   }
 
   Widget _buildHistorySection(PeminjamanState peminjamanState) {
@@ -1125,7 +1125,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 50).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (index * 50).ms);
   }
 
   void _showPinjamDialog(AlatModel book) {
@@ -1958,7 +1958,7 @@ class _DashboardPeminjamState extends ConsumerState<DashboardPeminjam>
           ),
         ],
       ),
-    ).animate().fadeIn(duration: 400.ms, delay: (index * 80).ms);
+    ).animate().fadeIn(duration: 150.ms, delay: (index * 80).ms);
   }
 
   void _showReturnConfirmation(PeminjamanModel peminjaman) {

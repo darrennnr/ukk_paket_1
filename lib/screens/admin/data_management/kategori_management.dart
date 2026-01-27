@@ -359,6 +359,7 @@ class _KategoriManagementState extends ConsumerState<KategoriManagement> {
                       size: 18,
                       color: AppColors.textSecondary,
                     ),
+                    color: AppColors.surface,
                     offset: const Offset(0, 35),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

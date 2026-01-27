@@ -94,7 +94,7 @@ class PengembalianService {
     final response = await supabase
         .from(_table)
         .select(
-          '*, peminjaman(*, peminjam:users!peminjam_id(*)), petugas:users!petugas_id(*)',
+          '*, peminjaman(*, peminjam:users!peminjam_id(*), alat(*)), petugas:users!petugas_id(*)',
         )
         .order('created_at', ascending: false);
 

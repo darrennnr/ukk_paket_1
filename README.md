@@ -52,7 +52,6 @@ Pastikan Anda telah menginstall:
    
    Buat file `.env` di root folder `App/` dengan isi:
    ```env
-   API_URL=http://127.0.0.1:8000
    SUPABASE_URL=your_supabase_url
    SUPABASE_ANON_KEY=your_supabase_anon_key
    ```

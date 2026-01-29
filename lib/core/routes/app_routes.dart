@@ -22,12 +22,13 @@ import 'package:paket_3_training/screens/peminjam/history.dart';
 import 'package:paket_3_training/screens/peminjam/kembalikan_buku.dart';
 import 'package:paket_3_training/screens/petugas/laporan.dart';
 import 'package:paket_3_training/screens/admin/impor_data/import_data.dart';
+import 'package:paket_3_training/screens/splash/splash_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authNotifier = ref.watch(authProvider.notifier);
   
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/',
     refreshListenable: authNotifier, // Listen to auth state changes
     redirect: (context, state) {
       final authState = ref.read(authProvider);
@@ -35,6 +36,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isLoading = authState.isLoading;
       final user = authState.user;
       final currentPath = state.matchedLocation;
+
+      // Allow splash screen to be shown
+      if (currentPath == '/') {
+        return null;
+      }
 
       // Wait for auth check to complete
       if (isLoading) {
@@ -75,6 +81,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null; // No redirect needed
     },
     routes: [
+      // Splash Screen Route
+      GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+
       // Auth Routes
       GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
 
